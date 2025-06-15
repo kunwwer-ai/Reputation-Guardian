@@ -6,17 +6,14 @@ import { OverviewTab } from "@/components/dashboard/overview-tab";
 import { MentionsTab } from "@/components/dashboard/mentions-tab";
 import { LegalCasesTab } from "@/components/dashboard/legal-cases-tab";
 import { EncyclopediaTab } from "@/components/dashboard/encyclopedia-tab";
-import { NewsFeedTab } from "@/components/dashboard/news-feed-tab"; // Import new tab
+import { NewsFeedTab } from "@/components/dashboard/news-feed-tab";
+import { ContentGenerationTab } from "@/components/dashboard/content-generation-tab"; // Import new tab
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-// Placeholder for RiskAssessmentTool and ContentGenerationTool components
+// Placeholder for RiskAssessmentTool
 function RiskAssessmentToolPlaceholder() {
   return <div className="p-4 border rounded-lg bg-card shadow"><h3 className="text-xl font-semibold">Risk Assessment Tool</h3><p className="text-muted-foreground">AI-powered scanning tool to analyze online mentions and legal cases, and assess their risk level. (Coming Soon)</p></div>;
-}
-
-function ContentGenerationToolPlaceholder() {
-  return <div className="p-4 border rounded-lg bg-card shadow"><h3 className="text-xl font-semibold">Content Generation Tool</h3><p className="text-muted-foreground">Tool that summarizes content excerpts from mentions, and generate initial drafts of letters (DMCA, GDPR, etc.). (Coming Soon)</p></div>;
 }
 
 const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-feed", "risk-assessment", "content-generation"];
@@ -87,7 +84,7 @@ export default function DashboardPage() {
             <RiskAssessmentToolPlaceholder />
           </TabsContent>
           <TabsContent value="content-generation" className="mt-0">
-            <ContentGenerationToolPlaceholder />
+            <ContentGenerationTab />
           </TabsContent>
         </div>
       </Tabs>

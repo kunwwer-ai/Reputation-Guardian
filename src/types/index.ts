@@ -68,3 +68,13 @@ export interface ContentSummaryResult {
 export interface DMCALetterResult {
   dmcaLetter: string;
 }
+
+export interface GenerateDerivedContentInput {
+  newsTitle: string;
+  newsExcerpt: string;
+  contentType: "Summary" | "Tweet" | "LinkedIn Post" | "Key Takeaways" | "Press Release Snippet";
+}
+
+export interface GenerateDerivedContentResult {
+  generatedText: string;
+}
