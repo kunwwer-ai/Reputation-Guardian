@@ -6,7 +6,7 @@ import { MentionCard } from "@/components/mention-card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"; // Added for skeleton
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 
 // Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
@@ -120,4 +120,3 @@ export function MentionsTab() {
     </div>
   );
 }
-
