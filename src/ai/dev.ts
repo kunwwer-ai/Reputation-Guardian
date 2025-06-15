@@ -1,1 +1,6 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/generate-dmca-letter.ts';
+import '@/ai/flows/analyze-mention-risk.ts';
+import '@/ai/flows/summarize-content-excerpt.ts';

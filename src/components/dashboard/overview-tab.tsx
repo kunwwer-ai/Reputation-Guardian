@@ -1,0 +1,149 @@
+
+"use client";
+
+import type { Profile } from "@/types";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, Building, User } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { useState, useEffect } from "react";
+
+// Mock Data
+const MOCK_PROFILE: Profile = {
+  id: "profile1",
+  full_name: "John Doe Inc.",
+  entity_type: "company",
+  reputation_score: 75, // Example score out of 100
+  threat_level: "YELLOW",
+  verified: true,
+  last_updated: new Date(Date.now() - 86400000 * 1), // 1 day ago
+};
+
+export function OverviewTab() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate fetching data
+    const timer = setTimeout(() => {
+      setProfile(MOCK_PROFILE);
+      setIsLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading || !profile) {
+    return (
+      <Card className="shadow-lg">
+        <CardHeader className="flex flex-row items-center gap-4">
+            <div className="h-16 w-16 bg-muted rounded-full animate-pulse"></div>
+            <div>
+                <div className="h-7 bg-muted rounded w-48 animate-pulse"></div>
+                <div className="h-4 bg-muted rounded w-32 mt-2 animate-pulse"></div>
+            </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+            <div className="h-5 bg-muted rounded w-1/3 animate-pulse"></div>
+            <div className="h-8 bg-muted rounded w-full animate-pulse"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i} className="p-4 bg-muted/50 rounded-lg space-y-2">
+                        <div className="h-4 bg-muted rounded w-2/3 animate-pulse"></div>
+                        <div className="h-6 bg-muted rounded w-1/2 animate-pulse"></div>
+                    </div>
+                ))}
+            </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const getThreatBadgeVariant = (level: Profile['threat_level']) => {
+    switch (level) {
+      case 'RED': return 'destructive';
+      case 'YELLOW': return 'default'; // Using primary for yellow as 'warning' isn't a direct variant
+      case 'GREEN': return 'default'; // Using primary for green as 'success' isn't a direct variant
+      default: return 'secondary';
+    }
+  };
+
+  const getThreatIcon = (level: Profile['threat_level']) => {
+    switch(level) {
+        case 'RED': return <AlertTriangle className="mr-1 h-4 w-4" />;
+        case 'YELLOW': return <AlertTriangle className="mr-1 h-4 w-4" />; // Could use a different icon
+        case 'GREEN': return <ShieldCheck className="mr-1 h-4 w-4" />;
+        default: return null;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card className="shadow-xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-br from-primary/80 to-primary p-6">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20 border-4 border-background shadow-md">
+              <AvatarImage src={`https://placehold.co/80x80.png?text=${profile.full_name.substring(0,1)}`} alt={profile.full_name} data-ai-hint="company logo" />
+              <AvatarFallback className="text-2xl bg-primary-foreground text-primary">
+                {profile.entity_type === 'company' ? <Building className="h-10 w-10" /> : <User className="h-10 w-10" />}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-3xl font-headline text-primary-foreground">{profile.full_name}</CardTitle>
+              <CardDescription className="text-primary-foreground/80 capitalize">
+                {profile.entity_type} - Last Updated: {profile.last_updated.toLocaleDateString()}
+              </CardDescription>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+                {profile.verified && <Badge variant="secondary" className="bg-green-500 text-white"><ShieldCheck className="mr-1 h-4 w-4" />Verified</Badge>}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-6 space-y-6">
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <h3 className="text-lg font-semibold">Reputation Score</h3>
+              <span className={`text-2xl font-bold ${profile.reputation_score >= 70 ? 'text-green-600' : profile.reputation_score >= 40 ? 'text-yellow-500' : 'text-red-500'}`}>
+                {profile.reputation_score} / 100
+              </span>
+            </div>
+            <Progress value={profile.reputation_score} aria-label={`Reputation score: ${profile.reputation_score} out of 100`} className="h-3 [&>div]:bg-gradient-to-r [&>div]:from-accent [&>div]:to-primary" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-card/50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center">
+                    {getThreatIcon(profile.threat_level)}
+                    Threat Level
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Badge variant={getThreatBadgeVariant(profile.threat_level)} className="text-lg px-3 py-1">{profile.threat_level}</Badge>
+              </CardContent>
+            </Card>
+            <Card className="bg-card/50">
+              <CardHeader><CardTitle className="text-base flex items-center"><TrendingUp className="mr-2 h-5 w-5 text-green-500" />Positive Mentions</CardTitle></CardHeader>
+              <CardContent><p className="text-3xl font-bold">12</p></CardContent> {/* Mock data */}
+            </Card>
+            <Card className="bg-card/50">
+              <CardHeader><CardTitle className="text-base flex items-center"><TrendingDown className="mr-2 h-5 w-5 text-red-500" />Negative Mentions</CardTitle></CardHeader>
+              <CardContent><p className="text-3xl font-bold">3</p></CardContent> {/* Mock data */}
+            </Card>
+          </div>
+          
+          {/* Placeholder for quick actions or recent activity */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Recent Activity</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>New mention found on Twitter (2 hours ago)</li>
+                <li>Legal case JD-C2023-001 updated (1 day ago)</li>
+                <li>Encyclopedia section "Company History" verified (3 days ago)</li>
+            </ul>
+          </div>
+
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
