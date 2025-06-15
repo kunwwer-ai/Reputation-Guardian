@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={true} tooltip="Dashboard">
+              <SidebarMenuButton asChild isActive={false} tooltip="Dashboard">{/* Assuming default active based on page, not layout */}
                 <Link href="/dashboard">
                   <Home />
                   <span>Dashboard</span>
@@ -27,67 +27,56 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Mentions">
-                <Link href="/dashboard#mentions">
+              <SidebarMenuButton asChild tooltip="Mentions"><Link href="/dashboard#mentions">
                   <FileText />
                   <span>Mentions</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="News Feed">
-                <Link href="/dashboard#news-feed">
+              <SidebarMenuButton asChild tooltip="News Feed"><Link href="/dashboard#news-feed">
                   <Newspaper />
                   <span>News Feed</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Legal Cases">
-                <Link href="/dashboard#legal-cases">
+              <SidebarMenuButton asChild tooltip="Legal Cases"><Link href="/dashboard#legal-cases">
                   <Briefcase />
                   <span>Legal Cases</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Encyclopedia">
-                <Link href="/dashboard#encyclopedia">
+              <SidebarMenuButton asChild tooltip="Encyclopedia"><Link href="/dashboard#encyclopedia">
                   <BookOpen />
                   <span>Encyclopedia</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Risk Assessment Tool">
-                <Link href="/dashboard#risk-assessment">
+              <SidebarMenuButton asChild tooltip="Risk Assessment Tool"><Link href="/dashboard#risk-assessment">
                   <BotMessageSquare />
                   <span>Risk Assessment</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Content Generation">
-                <Link href="/dashboard#content-generation">
+              <SidebarMenuButton asChild tooltip="Content Generation"><Link href="/dashboard#content-generation">
                   <PencilRuler />
                   <span>Content Generation</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-        {/* <SidebarFooter className="mt-auto">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Settings">
-                <Link href="/dashboard/settings">
+             <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Settings"><Link href="/dashboard/settings">
                   <Settings />
                   <span>Settings</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarFooter> */}
+        </SidebarContent>
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
