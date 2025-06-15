@@ -58,6 +58,7 @@ export default function SettingsPage() {
     localStorage.setItem("settings_fullName", fullName);
     localStorage.setItem("settings_email", email);
     toast({ title: "Profile Saved", description: "Your profile information has been updated." });
+    window.dispatchEvent(new CustomEvent('settingsUpdated')); // Notify UserNav and OverviewTab
   };
 
   const handleSavePreferences = () => {

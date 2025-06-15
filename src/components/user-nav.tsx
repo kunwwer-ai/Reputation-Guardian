@@ -20,44 +20,44 @@ import { useState, useEffect } from "react";
 export function UserNav() {
   const [userName, setUserName] = useState("Kunwer Sachdev");
   const [userEmail, setUserEmail] = useState("kunwer.sachdev@example.com");
-  const [userAvatar, setUserAvatar] = useState(""); // Initialize empty
+  const [userAvatar, setUserAvatar] = useState("");
 
   useEffect(() => {
-    const storedFullName = localStorage.getItem("settings_fullName");
-    if (storedFullName) {
-      setUserName(storedFullName);
-    }
+    const loadUserData = () => {
+      const storedFullName = localStorage.getItem("settings_fullName");
+      const currentName = storedFullName || "Kunwer Sachdev"; // Use default if nothing stored
+      setUserName(currentName);
 
-    const storedEmail = localStorage.getItem("settings_email");
-    if (storedEmail) {
-      setUserEmail(storedEmail);
-    }
+      const storedEmail = localStorage.getItem("settings_email");
+      setUserEmail(storedEmail || "kunwer.sachdev@example.com"); // Use default
 
-    const storedAvatarSrc = localStorage.getItem("settings_avatarSrc");
-    if (storedAvatarSrc) {
-      setUserAvatar(storedAvatarSrc);
-    } else {
-      // Fallback to initials-based placeholder if no avatar in localStorage
-      const currentName = storedFullName || userName;
-      const initials = currentName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || 'KS';
-      setUserAvatar(`https://placehold.co/40x40.png?text=${initials}`);
-    }
-    
-    // Listen for custom event to update avatar if changed elsewhere
-    // This is a simple way to sync without a global state manager
-    const handleAvatarUpdate = () => {
-      const updatedAvatarSrc = localStorage.getItem("settings_avatarSrc");
-      if (updatedAvatarSrc) {
-        setUserAvatar(updatedAvatarSrc);
+      const storedAvatarSrc = localStorage.getItem("settings_avatarSrc");
+      if (storedAvatarSrc) {
+        setUserAvatar(storedAvatarSrc);
+      } else {
+        const initials = currentName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || 'KS';
+        setUserAvatar(`https://placehold.co/40x40.png?text=${initials}`);
       }
     };
-    window.addEventListener('avatarUpdated', handleAvatarUpdate);
+
+    loadUserData(); // Initial load
+
+    // Listen for updates from settings page (name/email) and overview tab (avatar)
+    // Using a single 'userProfileUpdated' event for simplicity now
+    const handleProfileUpdate = () => {
+      loadUserData();
+    };
+    
+    window.addEventListener('settingsUpdated', handleProfileUpdate); // For name/email changes
+    window.addEventListener('avatarUpdated', handleProfileUpdate);   // For avatar changes
 
     return () => {
-      window.removeEventListener('avatarUpdated', handleAvatarUpdate);
+      window.removeEventListener('settingsUpdated', handleProfileUpdate);
+      window.removeEventListener('avatarUpdated', handleProfileUpdate);
     };
+  }, []); // Empty dependency array: runs once on mount to load initial data and set up listeners.
 
-  }, [userName]); // Re-run if userName from props/localStorage changes (it does via settings page)
+  const fallbackInitials = userName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-5 w-5" />;
 
   return (
     <DropdownMenu>
@@ -66,7 +66,7 @@ export function UserNav() {
           <Avatar className="h-10 w-10">
             <AvatarImage src={userAvatar} alt={userName} data-ai-hint="user avatar" />
             <AvatarFallback>
-              {(userName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase()) || <User className="h-5 w-5" />}
+              {fallbackInitials}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -99,7 +99,6 @@ export function UserNav() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          {/* In a real app, this would trigger a logout function */}
           <Link href="/">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
@@ -110,3 +109,5 @@ export function UserNav() {
     </DropdownMenu>
   );
 }
+
+    

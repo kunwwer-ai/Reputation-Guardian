@@ -9,7 +9,7 @@ import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User, Edit3 } fro
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button"; // Added Button
+import { Button } from "@/components/ui/button";
 
 // Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
@@ -25,26 +25,49 @@ const MOCK_PROFILE: Profile = {
 export function OverviewTab() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [avatarSrc, setAvatarSrc] = useState<string>(""); // Initialize empty
+  const [avatarSrc, setAvatarSrc] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simulate fetching data
+    // Simulate fetching profile data
     const timer = setTimeout(() => {
-      setProfile(MOCK_PROFILE);
-      // Load avatar from localStorage or set default
+      let currentProfile = MOCK_PROFILE;
+      const storedFullName = localStorage.getItem("settings_fullName");
+      if (storedFullName) {
+        currentProfile = { ...currentProfile, full_name: storedFullName };
+      }
+      setProfile(currentProfile);
+
+      // Load avatar from localStorage or set default based on potentially updated profile name
       const storedAvatar = localStorage.getItem("settings_avatarSrc");
       if (storedAvatar) {
         setAvatarSrc(storedAvatar);
       } else {
-        const initialChar = MOCK_PROFILE.full_name.charAt(0) || 'P';
+        const initialChar = currentProfile.full_name.charAt(0).toUpperCase() || 'P';
         setAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
       }
       setIsLoading(false);
     }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    
+    // Listener for profile name changes from settings to update avatar placeholder if no image is set
+    const handleProfileNameUpdate = () => {
+      const storedFullName = localStorage.getItem("settings_fullName");
+      const storedAvatar = localStorage.getItem("settings_avatarSrc");
+      if (storedFullName && !storedAvatar && profile) { // only update if no custom avatar and profile exists
+         setProfile(prevProfile => prevProfile ? {...prevProfile, full_name: storedFullName} : null);
+         const initialChar = storedFullName.charAt(0).toUpperCase() || 'P';
+         setAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
+      }
+    };
+
+    window.addEventListener('settingsUpdated', handleProfileNameUpdate);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('settingsUpdated', handleProfileNameUpdate);
+    };
+  }, []); // Empty dependency array means this runs once on mount to set up listeners and load initial data.
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,10 +76,9 @@ export function OverviewTab() {
       reader.onloadend = () => {
         const newAvatarSrc = reader.result as string;
         setAvatarSrc(newAvatarSrc);
-        localStorage.setItem("settings_avatarSrc", newAvatarSrc); // Save to localStorage
+        localStorage.setItem("settings_avatarSrc", newAvatarSrc);
         toast({ title: "Avatar Updated", description: "Your new avatar is now displayed." });
-        // Optionally, dispatch a custom event if UserNav needs to update without a full reload
-        // window.dispatchEvent(new CustomEvent('avatarUpdated'));
+        window.dispatchEvent(new CustomEvent('avatarUpdated')); // Notify UserNav
       };
       reader.readAsDataURL(file);
     }
@@ -70,14 +92,14 @@ export function OverviewTab() {
     return (
       <Card className="shadow-lg">
         <CardHeader className="flex flex-row items-center gap-4">
-            <div className="h-20 w-20 bg-muted rounded-full animate-pulse"></div> {/* Adjusted size */}
+            <div className="h-20 w-20 bg-muted rounded-full animate-pulse"></div>
             <div>
                 <div className="h-7 bg-muted rounded w-48 animate-pulse"></div>
                 <div className="h-4 bg-muted rounded w-32 mt-2 animate-pulse"></div>
             </div>
         </CardHeader>
-        <CardContent className="space-y-4 pt-6"> {/* Added pt-6 */}
-             <div className="h-10 bg-muted rounded w-32 animate-pulse mb-4"></div> {/* Placeholder for button */}
+        <CardContent className="space-y-4 pt-6">
+             <div className="h-10 bg-muted rounded w-32 animate-pulse mb-4"></div>
             <div className="h-5 bg-muted rounded w-1/3 animate-pulse"></div>
             <div className="h-8 bg-muted rounded w-full animate-pulse"></div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -110,6 +132,8 @@ export function OverviewTab() {
         default: return null;
     }
   };
+  
+  const avatarFallbackName = profile.full_name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-10 w-10" />;
 
   return (
     <div className="space-y-6">
@@ -120,7 +144,7 @@ export function OverviewTab() {
               <Avatar className="h-20 w-20 border-4 border-background shadow-md cursor-pointer" onClick={triggerFileInput} title="Click to change photo">
                 <AvatarImage src={avatarSrc} alt={profile.full_name} data-ai-hint="person portrait" />
                 <AvatarFallback className="text-3xl bg-primary-foreground text-primary">
-                  {profile.full_name.split(' ').map(n => n[0]).join('').substring(0,2) || <User className="h-10 w-10" />}
+                  {avatarFallbackName}
                 </AvatarFallback>
               </Avatar>
                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full pointer-events-none">
@@ -196,3 +220,5 @@ export function OverviewTab() {
     </div>
   );
 }
+
+    
