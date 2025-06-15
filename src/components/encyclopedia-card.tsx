@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 import { useToast } from "@/hooks/use-toast";
 
 interface EncyclopediaCardProps {
@@ -88,11 +88,7 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     setIsEditSectionDialogOpen(false);
   };
 
-
-  // Update internal state if the entry prop changes (e.g. loaded from localStorage)
-  // This is important if the parent component re-fetches or updates entries
-  // without a full re-mount of this card.
-  useState(() => {
+  useEffect(() => {
     setCurrentEntry(entry);
     setEditableTitle(entry.section_title);
     setEditableContent(entry.content_markdown);
@@ -111,8 +107,8 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
         </div>
       </CardHeader>
       <CardContent className="space-y-3 flex-grow">
-        <div className="prose prose-sm max-w-none dark:prose-invert bg-muted/30 p-3 rounded-md border h-full">
-          <pre className="whitespace-pre-wrap text-sm font-mono">{currentEntry.content_markdown}</pre>
+        <div className="prose prose-sm max-w-none dark:prose-invert bg-muted/30 p-3 rounded-md border">
+          <pre className="whitespace-pre-wrap text-sm font-mono bg-transparent border-0 p-0">{currentEntry.content_markdown}</pre>
         </div>
         {currentEntry.source_links && currentEntry.source_links.length > 0 && (
           <div>
@@ -222,5 +218,3 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     </Card>
   );
 }
-
-    
