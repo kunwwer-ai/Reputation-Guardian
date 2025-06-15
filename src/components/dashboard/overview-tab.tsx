@@ -5,10 +5,11 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User, Edit3 } from "lucide-react"; // Added Edit3
+import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User, Edit3 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { useState, useEffect, useRef } from "react"; // Added useRef
-import { useToast } from "@/hooks/use-toast"; // Added useToast
+import { useState, useEffect, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button"; // Added Button
 
 // Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
@@ -24,7 +25,7 @@ const MOCK_PROFILE: Profile = {
 export function OverviewTab() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [avatarSrc, setAvatarSrc] = useState<string>(`https://placehold.co/80x80.png`); // State for avatar
+  const [avatarSrc, setAvatarSrc] = useState<string>(""); // Initialize empty
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -32,9 +33,14 @@ export function OverviewTab() {
     // Simulate fetching data
     const timer = setTimeout(() => {
       setProfile(MOCK_PROFILE);
-      // Initialize avatarSrc based on profile or default
-      const initialChar = MOCK_PROFILE.full_name.charAt(0) || 'P';
-      setAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
+      // Load avatar from localStorage or set default
+      const storedAvatar = localStorage.getItem("settings_avatarSrc");
+      if (storedAvatar) {
+        setAvatarSrc(storedAvatar);
+      } else {
+        const initialChar = MOCK_PROFILE.full_name.charAt(0) || 'P';
+        setAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
+      }
       setIsLoading(false);
     }, 500);
     return () => clearTimeout(timer);
@@ -45,14 +51,18 @@ export function OverviewTab() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarSrc(reader.result as string);
+        const newAvatarSrc = reader.result as string;
+        setAvatarSrc(newAvatarSrc);
+        localStorage.setItem("settings_avatarSrc", newAvatarSrc); // Save to localStorage
         toast({ title: "Avatar Updated", description: "Your new avatar is now displayed." });
+        // Optionally, dispatch a custom event if UserNav needs to update without a full reload
+        // window.dispatchEvent(new CustomEvent('avatarUpdated'));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleAvatarClick = () => {
+  const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
 
@@ -60,13 +70,14 @@ export function OverviewTab() {
     return (
       <Card className="shadow-lg">
         <CardHeader className="flex flex-row items-center gap-4">
-            <div className="h-16 w-16 bg-muted rounded-full animate-pulse"></div>
+            <div className="h-20 w-20 bg-muted rounded-full animate-pulse"></div> {/* Adjusted size */}
             <div>
                 <div className="h-7 bg-muted rounded w-48 animate-pulse"></div>
                 <div className="h-4 bg-muted rounded w-32 mt-2 animate-pulse"></div>
             </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6"> {/* Added pt-6 */}
+             <div className="h-10 bg-muted rounded w-32 animate-pulse mb-4"></div> {/* Placeholder for button */}
             <div className="h-5 bg-muted rounded w-1/3 animate-pulse"></div>
             <div className="h-8 bg-muted rounded w-full animate-pulse"></div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -105,14 +116,14 @@ export function OverviewTab() {
       <Card className="shadow-xl overflow-hidden">
         <CardHeader className="bg-gradient-to-br from-primary/80 to-primary p-6">
           <div className="flex items-center gap-4">
-            <div className="relative group cursor-pointer" onClick={handleAvatarClick} title="Click to change photo">
-              <Avatar className="h-20 w-20 border-4 border-background shadow-md">
+             <div className="relative group">
+              <Avatar className="h-20 w-20 border-4 border-background shadow-md cursor-pointer" onClick={triggerFileInput} title="Click to change photo">
                 <AvatarImage src={avatarSrc} alt={profile.full_name} data-ai-hint="person portrait" />
-                <AvatarFallback className="text-2xl bg-primary-foreground text-primary">
-                  <User className="h-10 w-10" />
+                <AvatarFallback className="text-3xl bg-primary-foreground text-primary">
+                  {profile.full_name.split(' ').map(n => n[0]).join('').substring(0,2) || <User className="h-10 w-10" />}
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full pointer-events-none">
                 <Edit3 className="h-8 w-8 text-white" />
               </div>
             </div>
@@ -135,6 +146,10 @@ export function OverviewTab() {
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
+          <Button variant="outline" onClick={triggerFileInput} className="mb-4">
+            <Edit3 className="mr-2 h-4 w-4" /> Change Photo
+          </Button>
+
           <div>
             <div className="flex justify-between items-center mb-1">
               <h3 className="text-lg font-semibold">Reputation Score</h3>

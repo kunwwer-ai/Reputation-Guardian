@@ -20,7 +20,7 @@ import { useState, useEffect } from "react";
 export function UserNav() {
   const [userName, setUserName] = useState("Kunwer Sachdev");
   const [userEmail, setUserEmail] = useState("kunwer.sachdev@example.com");
-  const [userAvatar, setUserAvatar] = useState("https://placehold.co/40x40.png"); // Assuming avatar isn't in localStorage for now
+  const [userAvatar, setUserAvatar] = useState(""); // Initialize empty
 
   useEffect(() => {
     const storedFullName = localStorage.getItem("settings_fullName");
@@ -32,13 +32,32 @@ export function UserNav() {
     if (storedEmail) {
       setUserEmail(storedEmail);
     }
-    // Placeholder for avatar logic if we decide to store/retrieve it
-    // For now, the placeholder avatar might have initials based on the name
-    const initials = (storedFullName || userName).split(' ').map(n => n[0]).join('').substring(0,2) || 'KS';
-    setUserAvatar(`https://placehold.co/40x40.png?text=${initials}`);
 
+    const storedAvatarSrc = localStorage.getItem("settings_avatarSrc");
+    if (storedAvatarSrc) {
+      setUserAvatar(storedAvatarSrc);
+    } else {
+      // Fallback to initials-based placeholder if no avatar in localStorage
+      const currentName = storedFullName || userName;
+      const initials = currentName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || 'KS';
+      setUserAvatar(`https://placehold.co/40x40.png?text=${initials}`);
+    }
+    
+    // Listen for custom event to update avatar if changed elsewhere
+    // This is a simple way to sync without a global state manager
+    const handleAvatarUpdate = () => {
+      const updatedAvatarSrc = localStorage.getItem("settings_avatarSrc");
+      if (updatedAvatarSrc) {
+        setUserAvatar(updatedAvatarSrc);
+      }
+    };
+    window.addEventListener('avatarUpdated', handleAvatarUpdate);
 
-  }, [userName]); // Re-run if userName changes to update avatar initials potentially
+    return () => {
+      window.removeEventListener('avatarUpdated', handleAvatarUpdate);
+    };
+
+  }, [userName]); // Re-run if userName from props/localStorage changes (it does via settings page)
 
   return (
     <DropdownMenu>
@@ -47,7 +66,7 @@ export function UserNav() {
           <Avatar className="h-10 w-10">
             <AvatarImage src={userAvatar} alt={userName} data-ai-hint="user avatar" />
             <AvatarFallback>
-              <User className="h-5 w-5" />
+              {(userName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase()) || <User className="h-5 w-5" />}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -80,6 +99,7 @@ export function UserNav() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
+          {/* In a real app, this would trigger a logout function */}
           <Link href="/">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
