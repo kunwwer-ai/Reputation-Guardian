@@ -24,7 +24,7 @@ const MOCK_PROFILE: Profile = {
 export function OverviewTab() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [avatarSrc, setAvatarSrc] = useState<string>(`https://placehold.co/80x80.png?text=K`); // State for avatar
+  const [avatarSrc, setAvatarSrc] = useState<string>(`https://placehold.co/80x80.png`); // State for avatar
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -33,8 +33,8 @@ export function OverviewTab() {
     const timer = setTimeout(() => {
       setProfile(MOCK_PROFILE);
       // Initialize avatarSrc based on profile or default
-      // For now, using the default placeholder as MOCK_PROFILE doesn't have an avatar URL
-      setAvatarSrc(`https://placehold.co/80x80.png?text=${MOCK_PROFILE.full_name.charAt(0) || 'P'}`);
+      const initialChar = MOCK_PROFILE.full_name.charAt(0) || 'P';
+      setAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
       setIsLoading(false);
     }, 500);
     return () => clearTimeout(timer);
@@ -181,4 +181,3 @@ export function OverviewTab() {
     </div>
   );
 }
-
