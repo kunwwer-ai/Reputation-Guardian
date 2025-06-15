@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+
+const LOCAL_STORAGE_KEY = "encyclopediaEntries";
 
 // Updated Mock Encyclopedia Entries for Kunwer Sachdev (person)
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -32,7 +35,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     id: "enc3",
     profileId: "profile1",
     section_title: "Online Search Presence (Examples)",
-    content_markdown: "This section provides example search result links from various search engines for Kunwer Sachdev. In a full implementation, these could be dynamically fetched or curated.\n\nNote: These are illustrative examples.",
+    content_markdown: "This section provides example search result links from various search engines for Kunwer Sachdev. In a full implementation, these could be dynamically fetched or curated. Use the 'Add Link' button to add your own findings.",
     source_verified: false,
     disputed_flag: false,
     source_links: [
@@ -54,31 +57,48 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
 export function EncyclopediaTab() {
   const [entries, setEntries] = useState<EncyclopediaEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Simulate fetching data
-    const timer = setTimeout(() => {
+    const storedEntries = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedEntries) {
+      setEntries(JSON.parse(storedEntries));
+    } else {
       setEntries(initialMockEncyclopediaEntries);
-      setIsLoading(false);
-    }, 1400); 
-    return () => clearTimeout(timer);
+    }
+    setIsLoading(false);
   }, []);
 
 
   const handleUpdateEntry = (updatedEntry: EncyclopediaEntry) => {
-    setEntries(prevEntries => 
-      prevEntries.map(e => e.id === updatedEntry.id ? updatedEntry : e)
-    );
+    const newEntries = entries.map(e => e.id === updatedEntry.id ? updatedEntry : e);
+    setEntries(newEntries);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newEntries));
+    // Toast is handled in EncyclopediaCard for more specific messages
   };
 
   const handleAddEntry = () => {
-    console.log("Add new encyclopedia entry clicked");
+    // This functionality is not fully implemented for adding entirely new sections yet.
+    // For now, it's a placeholder.
+    const newEntry: EncyclopediaEntry = {
+      id: `enc${entries.length + 1}`,
+      profileId: "profile1",
+      section_title: "New Custom Section",
+      content_markdown: "Enter content here...",
+      source_verified: false,
+      disputed_flag: false,
+      source_links: [],
+    };
+    const newEntries = [...entries, newEntry];
+    setEntries(newEntries);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newEntries));
+    toast({ title: "New Section Added", description: "A new encyclopedia section has been created." });
   };
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {[...Array(3)].map((_, i) => ( // Adjusted for 3 entries
+        {[...Array(3)].map((_, i) => (
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
@@ -88,9 +108,10 @@ export function EncyclopediaTab() {
               <div className="h-4 bg-muted rounded w-full animate-pulse mb-2"></div>
               <div className="h-4 bg-muted rounded w-4/5 animate-pulse"></div>
             </CardContent>
-            <CardFooter className="flex gap-4">
+            <CardFooter className="flex flex-wrap gap-4 justify-between">
               <div className="h-8 bg-muted rounded w-28 animate-pulse"></div>
               <div className="h-8 bg-muted rounded w-28 animate-pulse"></div>
+              <div className="h-8 bg-muted rounded w-24 animate-pulse"></div>
             </CardFooter>
           </Card>
         ))}
@@ -120,3 +141,4 @@ export function EncyclopediaTab() {
   );
 }
 
+    
