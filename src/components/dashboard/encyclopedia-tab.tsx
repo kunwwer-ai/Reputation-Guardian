@@ -41,6 +41,12 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
       { title: "Kunwer Sachdev - DuckDuckGo Search", url: "https://duckduckgo.com/?q=Kunwer+Sachdev" },
       { title: "Kunwer Sachdev - Brave Search", url: "https://search.brave.com/search?q=Kunwer+Sachdev" },
       { title: "Kunwer Sachdev - Yahoo Search", url: "https://search.yahoo.com/search?p=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Startpage Search", url: "https://www.startpage.com/sp/search?query=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Yandex Search", url: "https://yandex.com/search/?text=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Baidu Search", url: "https://www.baidu.com/s?wd=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Ecosia Search", url: "https://www.ecosia.org/search?q=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Qwant Search", url: "https://www.qwant.com/?q=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - You.com Search", url: "https://you.com/search?q=Kunwer+Sachdev" },
     ],
   }
 ];
