@@ -4,7 +4,7 @@ import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, S
 import { AppLogo } from '@/components/icons';
 import { UserNav } from '@/components/user-nav';
 import Link from 'next/link';
-import { Home, FileText, Briefcase, BookOpen, Settings, BotMessageSquare, PencilRuler } from 'lucide-react';
+import { Home, FileText, Briefcase, BookOpen, Settings, BotMessageSquare, PencilRuler, Newspaper } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -31,6 +31,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 <Link href="/dashboard#mentions">
                   <FileText />
                   <span>Mentions</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="News Feed">
+                <Link href="/dashboard#news-feed">
+                  <Newspaper />
+                  <span>News Feed</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -6,6 +6,7 @@ import { OverviewTab } from "@/components/dashboard/overview-tab";
 import { MentionsTab } from "@/components/dashboard/mentions-tab";
 import { LegalCasesTab } from "@/components/dashboard/legal-cases-tab";
 import { EncyclopediaTab } from "@/components/dashboard/encyclopedia-tab";
+import { NewsFeedTab } from "@/components/dashboard/news-feed-tab"; // Import new tab
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -18,6 +19,7 @@ function ContentGenerationToolPlaceholder() {
   return <div className="p-4 border rounded-lg bg-card shadow"><h3 className="text-xl font-semibold">Content Generation Tool</h3><p className="text-muted-foreground">Tool that summarizes content excerpts from mentions, and generate initial drafts of letters (DMCA, GDPR, etc.). (Coming Soon)</p></div>;
 }
 
+const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-feed", "risk-assessment", "content-generation"];
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
@@ -27,14 +29,14 @@ export default function DashboardPage() {
   useEffect(() => {
     // Sync tab state with URL hash
     const hash = window.location.hash.substring(1);
-    if (hash && ["overview", "mentions", "legal-cases", "encyclopedia", "risk-assessment", "content-generation"].includes(hash)) {
+    if (hash && validTabs.includes(hash)) {
       setActiveTab(hash);
     }
     
     // Listen to hash changes
     const handleHashChange = () => {
       const newHash = window.location.hash.substring(1);
-      if (newHash && ["overview", "mentions", "legal-cases", "encyclopedia", "risk-assessment", "content-generation"].includes(newHash)) {
+      if (newHash && validTabs.includes(newHash)) {
         setActiveTab(newHash);
       } else if (!newHash) {
         setActiveTab("overview"); // Default to overview if hash is removed
@@ -55,11 +57,12 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col h-full">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-grow flex flex-col">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-6 mb-4 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-7 mb-4 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="mentions">Mentions</TabsTrigger>
           <TabsTrigger value="legal-cases">Legal Cases</TabsTrigger>
           <TabsTrigger value="encyclopedia">Encyclopedia</TabsTrigger>
+          <TabsTrigger value="news-feed">News Feed</TabsTrigger>
           <TabsTrigger value="risk-assessment">Risk Assessment</TabsTrigger>
           <TabsTrigger value="content-generation">Content Generation</TabsTrigger>
         </TabsList>
@@ -76,6 +79,9 @@ export default function DashboardPage() {
           </TabsContent>
           <TabsContent value="encyclopedia" className="mt-0">
             <EncyclopediaTab />
+          </TabsContent>
+          <TabsContent value="news-feed" className="mt-0">
+            <NewsFeedTab />
           </TabsContent>
           <TabsContent value="risk-assessment" className="mt-0">
             <RiskAssessmentToolPlaceholder />

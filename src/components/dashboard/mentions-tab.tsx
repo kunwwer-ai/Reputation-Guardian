@@ -19,7 +19,7 @@ const MOCK_PROFILE: Profile = {
   last_updated: new Date(),
 };
 
-const initialMockMentions: Mention[] = [
+export const initialMockMentions: Mention[] = [
   {
     id: "mention1",
     profileId: "profile1",
@@ -49,6 +49,26 @@ const initialMockMentions: Mention[] = [
     title: "Exploring Kunwer Sachdev's Impact on Tech",
     content_excerpt: "This article delves into the technological advancements pioneered by Kunwer Sachdev. While mostly positive, some commentators discuss the challenges of scaling such innovations rapidly.",
     timestamp: new Date(Date.now() - 86400000 * 12), // 12 days ago
+  },
+  {
+    id: "mention-news-2",
+    profileId: "profile1",
+    source_type: "news",
+    platform: "Economic Times",
+    url: "https://economictimes.example/kunwer-sachdev-sustainability",
+    title: "Kunwer Sachdev Advocates for Sustainable Business Practices",
+    content_excerpt: "Speaking at the Global Sustainability Summit, Kunwer Sachdev emphasized the importance of integrating sustainable practices into core business strategies for long-term success and environmental responsibility.",
+    timestamp: new Date(Date.now() - 86400000 * 5), // 5 days ago
+  },
+  {
+    id: "mention-news-3",
+    profileId: "profile1",
+    source_type: "news",
+    platform: "Forbes India",
+    url: "https://forbesindia.example/kunwer-sachdev-innovation-feature",
+    title: "Innovation Spotlight: How Kunwer Sachdev is Shaping the Future",
+    content_excerpt: "Forbes India features Kunwer Sachdev in its latest innovation spotlight, detailing his journey and impact on the technology sector. The article explores his approach to leadership and fostering a culture of innovation.",
+    timestamp: new Date(Date.now() - 86400000 * 10), // 10 days ago
   },
 ];
 
