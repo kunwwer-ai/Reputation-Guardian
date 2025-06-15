@@ -5,19 +5,19 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, Building, User } from "lucide-react";
+import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User } from "lucide-react"; // Changed Building to User
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
 
-// Mock Data
+// Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
   id: "profile1",
-  full_name: "John Doe Inc.",
-  entity_type: "company",
-  reputation_score: 75, // Example score out of 100
-  threat_level: "YELLOW",
+  full_name: "Kunwer Sachdev", // Updated
+  entity_type: "person",    // Updated
+  reputation_score: 82,     // Adjusted score
+  threat_level: "GREEN",    // Adjusted threat level
   verified: true,
-  last_updated: new Date(Date.now() - 86400000 * 1), // 1 day ago
+  last_updated: new Date(Date.now() - 86400000 * 3), // 3 days ago
 };
 
 export function OverviewTab() {
@@ -62,8 +62,8 @@ export function OverviewTab() {
   const getThreatBadgeVariant = (level: Profile['threat_level']) => {
     switch (level) {
       case 'RED': return 'destructive';
-      case 'YELLOW': return 'default'; // Using primary for yellow as 'warning' isn't a direct variant
-      case 'GREEN': return 'default'; // Using primary for green as 'success' isn't a direct variant
+      case 'YELLOW': return 'default'; 
+      case 'GREEN': return 'default'; 
       default: return 'secondary';
     }
   };
@@ -71,7 +71,7 @@ export function OverviewTab() {
   const getThreatIcon = (level: Profile['threat_level']) => {
     switch(level) {
         case 'RED': return <AlertTriangle className="mr-1 h-4 w-4" />;
-        case 'YELLOW': return <AlertTriangle className="mr-1 h-4 w-4" />; // Could use a different icon
+        case 'YELLOW': return <AlertTriangle className="mr-1 h-4 w-4" />; 
         case 'GREEN': return <ShieldCheck className="mr-1 h-4 w-4" />;
         default: return null;
     }
@@ -83,9 +83,11 @@ export function OverviewTab() {
         <CardHeader className="bg-gradient-to-br from-primary/80 to-primary p-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20 border-4 border-background shadow-md">
-              <AvatarImage src={`https://placehold.co/80x80.png?text=${profile.full_name.substring(0,1)}`} alt={profile.full_name} data-ai-hint="company logo" />
+              {/* Updated AvatarImage src and data-ai-hint */}
+              <AvatarImage src={`https://placehold.co/80x80.png?text=K`} alt={profile.full_name} data-ai-hint="person portrait" />
               <AvatarFallback className="text-2xl bg-primary-foreground text-primary">
-                {profile.entity_type === 'company' ? <Building className="h-10 w-10" /> : <User className="h-10 w-10" />}
+                {/* Updated to User icon */}
+                <User className="h-10 w-10" />
               </AvatarFallback>
             </Avatar>
             <div>
@@ -124,21 +126,20 @@ export function OverviewTab() {
             </Card>
             <Card className="bg-card/50">
               <CardHeader><CardTitle className="text-base flex items-center"><TrendingUp className="mr-2 h-5 w-5 text-green-500" />Positive Mentions</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">12</p></CardContent> {/* Mock data */}
+              <CardContent><p className="text-3xl font-bold">25</p></CardContent> {/* Mock data */}
             </Card>
             <Card className="bg-card/50">
               <CardHeader><CardTitle className="text-base flex items-center"><TrendingDown className="mr-2 h-5 w-5 text-red-500" />Negative Mentions</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">3</p></CardContent> {/* Mock data */}
+              <CardContent><p className="text-3xl font-bold">2</p></CardContent> {/* Mock data */}
             </Card>
           </div>
           
-          {/* Placeholder for quick actions or recent activity */}
           <div>
             <h3 className="text-lg font-semibold mb-2">Recent Activity</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>New mention found on Twitter (2 hours ago)</li>
-                <li>Legal case JD-C2023-001 updated (1 day ago)</li>
-                <li>Encyclopedia section "Company History" verified (3 days ago)</li>
+                <li>New interview published on Forbes (1 hour ago)</li>
+                <li>Encyclopedia section "Major Achievements" updated (2 days ago)</li>
+                <li>Social media sentiment shows slight positive shift (4 days ago)</li>
             </ul>
           </div>
 
@@ -147,3 +148,4 @@ export function OverviewTab() {
     </div>
   );
 }
+

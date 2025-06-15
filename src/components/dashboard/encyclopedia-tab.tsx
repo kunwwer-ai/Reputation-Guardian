@@ -8,25 +8,25 @@ import { PlusCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 
-
+// Updated Mock Encyclopedia Entries for Kunwer Sachdev (person)
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
   {
     id: "enc1",
     profileId: "profile1",
-    section_title: "Company History",
-    content_markdown: "John Doe Inc. was founded in 2010 by John Doe with the mission to...\n\nKey Milestones:\n- 2012: Launched first product\n- 2015: Secured Series A funding\n- 2020: Expanded to international markets",
+    section_title: "Biography Overview", // Updated
+    content_markdown: "Kunwer Sachdev is known for his entrepreneurial ventures in the energy sector.\n\nKey Highlights:\n- Founded Su-Kam Power Systems\n- Contributions to inverter technology in India\n- Speaker on innovation and entrepreneurship", // Updated
     source_verified: true,
     disputed_flag: false,
-    source_links: [{ title: "Official About Us Page", url: "https://example.com/about" }],
+    source_links: [{ title: "Official Bio Page (Example)", url: "https://example.com/kunwer-sachdev-bio" }],
   },
   {
     id: "enc2",
     profileId: "profile1",
-    section_title: "Controversies and Criticisms",
-    content_markdown: "In 2018, John Doe Inc. faced criticism regarding data privacy concerns. An article published by TechTimes highlighted potential issues...\n\nResponse from company: John Doe Inc. released a statement addressing the concerns and outlining steps taken to improve data security.",
-    source_verified: false,
-    disputed_flag: true,
-    source_links: [{ title: "TechTimes Article", url: "https://techtimes.example/article-xyz" }, { title: "Company Statement", url: "https://example.com/press-release-privacy" }],
+    section_title: "Major Achievements & Recognitions", // Updated
+    content_markdown: "Throughout his career, Kunwer Sachdev has received several accolades for his work.\n\n- Ernst & Young Entrepreneur of the Year (Manufacturing) \n- India Today's 'Icons of Tomorrow'\n\nSome public discussions have questioned the early-stage market impact of certain innovations, though largely reviews are positive.", // Updated
+    source_verified: true,
+    disputed_flag: false, // Adjusted
+    source_links: [{ title: "Award News Archive", url: "https://awards.example/ks-archive" }, { title: "Innovation Review Forum", url: "https://forum.example/ks-innovations" }],
   },
 ];
 
@@ -39,7 +39,7 @@ export function EncyclopediaTab() {
     const timer = setTimeout(() => {
       setEntries(initialMockEncyclopediaEntries);
       setIsLoading(false);
-    }, 1400); // Slightly different delay
+    }, 1400); 
     return () => clearTimeout(timer);
   }, []);
 
@@ -98,3 +98,4 @@ export function EncyclopediaTab() {
     </div>
   );
 }
+

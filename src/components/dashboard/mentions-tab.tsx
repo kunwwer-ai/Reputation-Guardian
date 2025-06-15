@@ -6,14 +6,15 @@ import { MentionCard } from "@/components/mention-card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"; // Added for skeleton
 
-// Mock Data - in a real app, this would come from a backend/API
+// Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
   id: "profile1",
-  full_name: "John Doe Inc.",
-  entity_type: "company",
-  reputation_score: 75,
-  threat_level: "YELLOW",
+  full_name: "Kunwer Sachdev", // Updated
+  entity_type: "person",    // Updated
+  reputation_score: 82,
+  threat_level: "GREEN",
   verified: true,
   last_updated: new Date(),
 };
@@ -22,32 +23,32 @@ const initialMockMentions: Mention[] = [
   {
     id: "mention1",
     profileId: "profile1",
-    source_type: "social",
-    platform: "Twitter",
-    url: "https://twitter.com/example/status/123",
-    title: "Negative Feedback on Twitter",
-    content_excerpt: "Just had a terrible experience with John Doe Inc. Their customer service is awful and the product broke after one day. Would not recommend to anyone. #JohnDoeInc #BadService",
-    timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
+    source_type: "news",
+    platform: "Business Today",
+    url: "https://businesstoday.example/kunwer-sachdev-interview",
+    title: "Kunwer Sachdev on Future of Energy Solutions",
+    content_excerpt: "In a recent interview, Kunwer Sachdev discussed the evolving landscape of energy solutions and his vision for sustainable power. He highlighted innovation as a key driver for the industry's growth. #KunwerSachdev #Energy",
+    timestamp: new Date(Date.now() - 86400000 * 3), // 3 days ago
   },
   {
     id: "mention2",
     profileId: "profile1",
-    source_type: "news",
-    platform: "Tech News Daily",
-    url: "https://technewsdaily.com/article/john-doe-inc-new-product",
-    title: "John Doe Inc. Launches Innovative New Product",
-    content_excerpt: "John Doe Inc. today announced the launch of their new flagship product, which promises to revolutionize the industry. Early reviews are positive, citing its ease of use and powerful features. This could be a game changer for the company.",
-    timestamp: new Date(Date.now() - 86400000 * 5), // 5 days ago
+    source_type: "social",
+    platform: "LinkedIn",
+    url: "https://linkedin.example/post/kunwer-sachdev-award",
+    title: "Discussion on Kunwer Sachdev's Recent Award",
+    content_excerpt: "Great to see Kunwer Sachdev recognized for his contributions to entrepreneurship. His journey is an inspiration to many young innovators in the field. Many are congratulating him on this achievement.",
+    timestamp: new Date(Date.now() - 86400000 * 7), // 7 days ago
   },
   {
     id: "mention3",
     profileId: "profile1",
     source_type: "search_engine",
     platform: "Google Search Result (Blog)",
-    url: "https://randomblog.com/john-doe-inc-review",
-    title: "Honest Review of John Doe Inc. Services",
-    content_excerpt: "I've been using John Doe Inc.'s services for the past six months. While there are some good aspects, there are also areas for improvement. The pricing is fair, but I've encountered a few bugs. Overall, a mixed experience.",
-    timestamp: new Date(Date.now() - 86400000 * 10), // 10 days ago
+    url: "https://techforum.example/kunwer-sachdev-innovations",
+    title: "Exploring Kunwer Sachdev's Impact on Tech",
+    content_excerpt: "This article delves into the technological advancements pioneered by Kunwer Sachdev. While mostly positive, some commentators discuss the challenges of scaling such innovations rapidly.",
+    timestamp: new Date(Date.now() - 86400000 * 12), // 12 days ago
   },
 ];
 
@@ -71,10 +72,8 @@ export function MentionsTab() {
     );
   };
 
-  // TODO: Implement Add Mention functionality
   const handleAddMention = () => {
     console.log("Add new mention clicked");
-    // This would typically open a dialog or navigate to a form
   };
 
   if (isLoading) {
@@ -121,3 +120,4 @@ export function MentionsTab() {
     </div>
   );
 }
+

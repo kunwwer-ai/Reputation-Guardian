@@ -8,13 +8,13 @@ import { PlusCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 
-// Mock Data
+// Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
   id: "profile1",
-  full_name: "John Doe Inc.",
-  entity_type: "company",
-  reputation_score: 75,
-  threat_level: "YELLOW",
+  full_name: "Kunwer Sachdev", // Updated
+  entity_type: "person",    // Updated
+  reputation_score: 82,
+  threat_level: "GREEN",
   verified: true,
   last_updated: new Date(),
 };
@@ -23,41 +23,42 @@ const initialMockLegalCases: LegalCase[] = [
   {
     id: "lc1",
     profileId: "profile1",
-    case_id: "JD-C2023-001",
-    court: "Northern District Court",
-    case_status: "Active",
-    risk_color: "🔴",
-    filing_date: new Date("2023-05-15"),
-    summary: "Lawsuit filed regarding patent infringement claims by Competitor X. Ongoing discovery phase.",
-    documents: [{ name: "Initial Filing.pdf", url: "#doc1" }, { name: "Evidence Exhibit A.pdf", url: "#doc2" }],
+    case_id: "KS-IP-2023-007", // Updated Case ID
+    court: "Tech Patent Tribunal",
+    case_status: "Potential",
+    risk_color: "🟡",
+    filing_date: new Date("2023-11-05"),
+    summary: "Potential intellectual property dispute regarding a new energy storage patent. Preliminary discussions underway.",
+    documents: [{ name: "Patent Application Preview.pdf", url: "#doc1" }, { name: "Initial Correspondence.pdf", url: "#doc2" }],
     removal_status: "Not Applicable",
-    last_action_date: new Date("2024-01-20"),
+    last_action_date: new Date("2024-02-15"),
   },
   {
     id: "lc2",
     profileId: "profile1",
-    case_id: "DMCA-T2024-045",
+    case_id: "DMCA-KS2024-002", // Updated Case ID
     court: "DMCA Takedown Request",
-    case_status: "Settled", // Assuming this means content removed
+    case_status: "Settled", 
     risk_color: "🟢",
-    filing_date: new Date("2024-02-10"),
-    summary: "DMCA takedown notice sent for unauthorized use of copyrighted marketing materials on a third-party blog.",
+    filing_date: new Date("2024-01-20"),
+    summary: "DMCA takedown notice sent for unauthorized use of Kunwer Sachdev's interview footage on a third-party video platform.",
     removal_status: "Successful",
-    last_action_date: new Date("2024-02-25"),
-    associated_mention_id: "mention3", // Corresponds to a mock mention
+    last_action_date: new Date("2024-02-05"),
+    associated_mention_id: "mention_video_infringement", // New mock mention ID
   },
 ];
 
-const MOCK_MENTIONS: Mention[] = [ // To link with legal cases
+// Updated MOCK_MENTIONS to align with new legal case context
+const MOCK_MENTIONS: Mention[] = [ 
    {
-    id: "mention3",
+    id: "mention_video_infringement",
     profileId: "profile1",
-    source_type: "search_engine",
-    platform: "Google Search Result (Blog)",
-    url: "https://randomblog.com/john-doe-inc-review", // This URL is infringing
-    title: "Honest Review of John Doe Inc. Services (Unauthorized Content)",
-    content_excerpt: "This blog post copied large sections of our official whitepaper without permission...",
-    timestamp: new Date(Date.now() - 86400000 * 10),
+    source_type: "other", // Assuming video platform
+    platform: "VideoShare Platform",
+    url: "https://videoshare.example/kunwer-sachdev-unauthorized-clip", 
+    title: "Unauthorized Clip of Kunwer Sachdev Interview",
+    content_excerpt: "This video channel posted a 10-minute segment from Kunwer Sachdev's recent keynote without any permission or credit...",
+    timestamp: new Date(Date.now() - 86400000 * 20), // 20 days ago
   },
 ];
 
@@ -70,7 +71,7 @@ export function LegalCasesTab() {
     const timer = setTimeout(() => {
       setLegalCases(initialMockLegalCases);
       setIsLoading(false);
-    }, 1200); // Slightly different delay
+    }, 1200); 
     return () => clearTimeout(timer);
   }, []);
 
@@ -81,7 +82,6 @@ export function LegalCasesTab() {
     );
   };
 
-  // TODO: Implement Add Legal Case functionality
   const handleAddLegalCase = () => {
     console.log("Add new legal case clicked");
   };
@@ -138,3 +138,4 @@ export function LegalCasesTab() {
     </div>
   );
 }
+
