@@ -15,16 +15,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut, Settings as SettingsIcon, UserCircle } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export function UserNav() {
-  const user = { name: "Kunwer Sachdev", email: "kunwer.sachdev@example.com", avatar: "https://placehold.co/40x40.png" };
+  const [userName, setUserName] = useState("Kunwer Sachdev");
+  const [userEmail, setUserEmail] = useState("kunwer.sachdev@example.com");
+  const [userAvatar, setUserAvatar] = useState("https://placehold.co/40x40.png"); // Assuming avatar isn't in localStorage for now
+
+  useEffect(() => {
+    const storedFullName = localStorage.getItem("settings_fullName");
+    if (storedFullName) {
+      setUserName(storedFullName);
+    }
+
+    const storedEmail = localStorage.getItem("settings_email");
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
+    // Placeholder for avatar logic if we decide to store/retrieve it
+    // For now, the placeholder avatar might have initials based on the name
+    const initials = (storedFullName || userName).split(' ').map(n => n[0]).join('').substring(0,2) || 'KS';
+    setUserAvatar(`https://placehold.co/40x40.png?text=${initials}`);
+
+
+  }, [userName]); // Re-run if userName changes to update avatar initials potentially
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={user.avatar} alt={user.name} data-ai-hint="user avatar" />
+            <AvatarImage src={userAvatar} alt={userName} data-ai-hint="user avatar" />
             <AvatarFallback>
               <User className="h-5 w-5" />
             </AvatarFallback>
@@ -34,9 +55,9 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
+            <p className="text-sm font-medium leading-none">{userName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {userEmail}
             </p>
           </div>
         </DropdownMenuLabel>
