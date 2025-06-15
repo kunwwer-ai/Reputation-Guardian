@@ -5,13 +5,12 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User, Edit3 } from "lucide-react";
+import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User, Edit3, Save, XCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
-// Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
   id: "profile1",
   full_name: "Kunwer Sachdev",
@@ -19,69 +18,75 @@ const MOCK_PROFILE: Profile = {
   reputation_score: 82,
   threat_level: "GREEN",
   verified: true,
-  last_updated: new Date(Date.now() - 86400000 * 3), // 3 days ago
+  last_updated: new Date(Date.now() - 86400000 * 3), 
 };
 
 export function OverviewTab() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [avatarSrc, setAvatarSrc] = useState<string>("");
+  
+  const [savedAvatarSrc, setSavedAvatarSrc] = useState<string>("");
+  const [previewAvatarSrc, setPreviewAvatarSrc] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Simulate fetching profile data
-    const timer = setTimeout(() => {
-      let currentProfile = MOCK_PROFILE;
-      const storedFullName = localStorage.getItem("settings_fullName");
-      if (storedFullName) {
-        currentProfile = { ...currentProfile, full_name: storedFullName };
-      }
-      setProfile(currentProfile);
+  const loadProfileData = () => {
+    let currentProfile = MOCK_PROFILE;
+    const storedFullName = localStorage.getItem("settings_fullName");
+    if (storedFullName) {
+      currentProfile = { ...currentProfile, full_name: storedFullName };
+    }
+    setProfile(currentProfile);
 
-      // Load avatar from localStorage or set default based on potentially updated profile name
-      const storedAvatar = localStorage.getItem("settings_avatarSrc");
-      if (storedAvatar) {
-        setAvatarSrc(storedAvatar);
-      } else {
-        const initialChar = currentProfile.full_name.charAt(0).toUpperCase() || 'P';
-        setAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
-      }
-      setIsLoading(false);
-    }, 500);
+    const storedAvatar = localStorage.getItem("settings_avatarSrc");
+    const initialChar = currentProfile.full_name.charAt(0).toUpperCase() || 'P';
+    const placeholderAvatar = `https://placehold.co/80x80.png?text=${initialChar}`;
+    setSavedAvatarSrc(storedAvatar || placeholderAvatar);
     
-    // Listener for profile name changes from settings to update avatar placeholder if no image is set
-    const handleProfileNameUpdate = () => {
-      const storedFullName = localStorage.getItem("settings_fullName");
-      const storedAvatar = localStorage.getItem("settings_avatarSrc");
-      if (storedFullName && !storedAvatar && profile) { // only update if no custom avatar and profile exists
-         setProfile(prevProfile => prevProfile ? {...prevProfile, full_name: storedFullName} : null);
-         const initialChar = storedFullName.charAt(0).toUpperCase() || 'P';
-         setAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
-      }
-    };
+    // If there's no stored custom avatar, ensure preview is also null initially
+    if (!storedAvatar) {
+        setPreviewAvatarSrc(null);
+    }
+  };
 
-    window.addEventListener('settingsUpdated', handleProfileNameUpdate);
+  useEffect(() => {
+    loadProfileData();
+    setIsLoading(false);
+    
+    const handleSettingsUpdate = () => loadProfileData();
+    window.addEventListener('settingsUpdated', handleSettingsUpdate);
+    window.addEventListener('avatarUpdated', handleSettingsUpdate); // Listen for avatar changes too
 
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener('settingsUpdated', handleProfileNameUpdate);
+      window.removeEventListener('settingsUpdated', handleSettingsUpdate);
+      window.removeEventListener('avatarUpdated', handleSettingsUpdate);
     };
-  }, []); // Empty dependency array means this runs once on mount to set up listeners and load initial data.
+  }, []);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const newAvatarSrc = reader.result as string;
-        setAvatarSrc(newAvatarSrc);
-        localStorage.setItem("settings_avatarSrc", newAvatarSrc);
-        toast({ title: "Avatar Updated", description: "Your new avatar is now displayed." });
-        window.dispatchEvent(new CustomEvent('avatarUpdated')); // Notify UserNav
+        setPreviewAvatarSrc(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleSavePhoto = () => {
+    if (previewAvatarSrc) {
+      localStorage.setItem("settings_avatarSrc", previewAvatarSrc);
+      setSavedAvatarSrc(previewAvatarSrc);
+      setPreviewAvatarSrc(null); // Clear preview
+      toast({ title: "Avatar Updated", description: "Your new avatar has been saved." });
+      window.dispatchEvent(new CustomEvent('avatarUpdated'));
+    }
+  };
+
+  const handleCancelPhotoChange = () => {
+    setPreviewAvatarSrc(null); // Clear preview
   };
 
   const triggerFileInput = () => {
@@ -134,6 +139,7 @@ export function OverviewTab() {
   };
   
   const avatarFallbackName = profile.full_name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-10 w-10" />;
+  const displayAvatarSrc = previewAvatarSrc || savedAvatarSrc;
 
   return (
     <div className="space-y-6">
@@ -141,15 +147,12 @@ export function OverviewTab() {
         <CardHeader className="bg-gradient-to-br from-primary/80 to-primary p-6">
           <div className="flex items-center gap-4">
              <div className="relative group">
-              <Avatar className="h-20 w-20 border-4 border-background shadow-md cursor-pointer" onClick={triggerFileInput} title="Click to change photo">
-                <AvatarImage src={avatarSrc} alt={profile.full_name} data-ai-hint="person portrait" />
+              <Avatar className="h-20 w-20 border-4 border-background shadow-md">
+                <AvatarImage src={displayAvatarSrc} alt={profile.full_name} data-ai-hint="person portrait" />
                 <AvatarFallback className="text-3xl bg-primary-foreground text-primary">
                   {avatarFallbackName}
                 </AvatarFallback>
               </Avatar>
-               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full pointer-events-none">
-                <Edit3 className="h-8 w-8 text-white" />
-              </div>
             </div>
             <input 
               type="file" 
@@ -170,9 +173,21 @@ export function OverviewTab() {
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          <Button variant="outline" onClick={triggerFileInput} className="mb-4">
-            <Edit3 className="mr-2 h-4 w-4" /> Change Photo
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={triggerFileInput}>
+              <Edit3 className="mr-2 h-4 w-4" /> Change Photo
+            </Button>
+            {previewAvatarSrc && (
+              <>
+                <Button onClick={handleSavePhoto}>
+                  <Save className="mr-2 h-4 w-4" /> Save Photo
+                </Button>
+                <Button variant="ghost" onClick={handleCancelPhotoChange}>
+                  <XCircle className="mr-2 h-4 w-4" /> Cancel
+                </Button>
+              </>
+            )}
+          </div>
 
           <div>
             <div className="flex justify-between items-center mb-1">
@@ -198,11 +213,11 @@ export function OverviewTab() {
             </Card>
             <Card className="bg-card/50">
               <CardHeader><CardTitle className="text-base flex items-center"><TrendingUp className="mr-2 h-5 w-5 text-green-500" />Positive Mentions</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">25</p></CardContent> {/* Mock data */}
+              <CardContent><p className="text-3xl font-bold">25</p></CardContent>
             </Card>
             <Card className="bg-card/50">
               <CardHeader><CardTitle className="text-base flex items-center"><TrendingDown className="mr-2 h-5 w-5 text-red-500" />Negative Mentions</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">2</p></CardContent> {/* Mock data */}
+              <CardContent><p className="text-3xl font-bold">2</p></CardContent>
             </Card>
           </div>
           
@@ -220,5 +235,3 @@ export function OverviewTab() {
     </div>
   );
 }
-
-    
