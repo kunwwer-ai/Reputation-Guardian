@@ -5,17 +5,18 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User } from "lucide-react"; // Changed Building to User
+import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User, Edit3 } from "lucide-react"; // Added Edit3
 import { Progress } from "@/components/ui/progress";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // Added useRef
+import { useToast } from "@/hooks/use-toast"; // Added useToast
 
 // Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
   id: "profile1",
-  full_name: "Kunwer Sachdev", // Updated
-  entity_type: "person",    // Updated
-  reputation_score: 82,     // Adjusted score
-  threat_level: "GREEN",    // Adjusted threat level
+  full_name: "Kunwer Sachdev",
+  entity_type: "person",
+  reputation_score: 82,
+  threat_level: "GREEN",
   verified: true,
   last_updated: new Date(Date.now() - 86400000 * 3), // 3 days ago
 };
@@ -23,15 +24,37 @@ const MOCK_PROFILE: Profile = {
 export function OverviewTab() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [avatarSrc, setAvatarSrc] = useState<string>(`https://placehold.co/80x80.png?text=K`); // State for avatar
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Simulate fetching data
     const timer = setTimeout(() => {
       setProfile(MOCK_PROFILE);
+      // Initialize avatarSrc based on profile or default
+      // For now, using the default placeholder as MOCK_PROFILE doesn't have an avatar URL
+      setAvatarSrc(`https://placehold.co/80x80.png?text=${MOCK_PROFILE.full_name.charAt(0) || 'P'}`);
       setIsLoading(false);
     }, 500);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarSrc(reader.result as string);
+        toast({ title: "Avatar Updated", description: "Your new avatar is now displayed." });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
 
   if (isLoading || !profile) {
     return (
@@ -82,14 +105,24 @@ export function OverviewTab() {
       <Card className="shadow-xl overflow-hidden">
         <CardHeader className="bg-gradient-to-br from-primary/80 to-primary p-6">
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 border-4 border-background shadow-md">
-              {/* Updated AvatarImage src and data-ai-hint */}
-              <AvatarImage src={`https://placehold.co/80x80.png?text=K`} alt={profile.full_name} data-ai-hint="person portrait" />
-              <AvatarFallback className="text-2xl bg-primary-foreground text-primary">
-                {/* Updated to User icon */}
-                <User className="h-10 w-10" />
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative group cursor-pointer" onClick={handleAvatarClick} title="Click to change photo">
+              <Avatar className="h-20 w-20 border-4 border-background shadow-md">
+                <AvatarImage src={avatarSrc} alt={profile.full_name} data-ai-hint="person portrait" />
+                <AvatarFallback className="text-2xl bg-primary-foreground text-primary">
+                  <User className="h-10 w-10" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                <Edit3 className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageChange} 
+              style={{ display: 'none' }} 
+              accept="image/*" 
+            />
             <div>
               <CardTitle className="text-3xl font-headline text-primary-foreground">{profile.full_name}</CardTitle>
               <CardDescription className="text-primary-foreground/80 capitalize">
