@@ -17,7 +17,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     content_markdown: "Kunwer Sachdev is known for his entrepreneurial ventures in the energy sector.\n\nKey Highlights:\n- Founded Su-Kam Power Systems\n- Contributions to inverter technology in India\n- Speaker on innovation and entrepreneurship",
     source_verified: true,
     disputed_flag: false,
-    source_links: [{ title: "Kunwer Sachdev - Google Search", url: "https://g.co/kgs/PJj2Uru" }],
+    source_links: [{ title: "Kunwer Sachdev - Official Google Search", url: "https://g.co/kgs/PJj2Uru" }],
   },
   {
     id: "enc2",
@@ -28,6 +28,21 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     disputed_flag: false,
     source_links: [{ title: "Award News Archive", url: "https://awards.example/ks-archive" }, { title: "Innovation Review Forum", url: "https://forum.example/ks-innovations" }],
   },
+  {
+    id: "enc3",
+    profileId: "profile1",
+    section_title: "Online Search Presence (Examples)",
+    content_markdown: "This section provides example search result links from various search engines for Kunwer Sachdev. In a full implementation, these could be dynamically fetched or curated.\n\nNote: These are illustrative examples.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [
+      { title: "Kunwer Sachdev - Google Search", url: "https://www.google.com/search?q=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Bing Search", url: "https://www.bing.com/search?q=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - DuckDuckGo Search", url: "https://duckduckgo.com/?q=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Brave Search", url: "https://search.brave.com/search?q=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Yahoo Search", url: "https://search.yahoo.com/search?p=Kunwer+Sachdev" },
+    ],
+  }
 ];
 
 export function EncyclopediaTab() {
@@ -57,7 +72,7 @@ export function EncyclopediaTab() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {[...Array(2)].map((_, i) => (
+        {[...Array(3)].map((_, i) => ( // Adjusted for 3 entries
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
