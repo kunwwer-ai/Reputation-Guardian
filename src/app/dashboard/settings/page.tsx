@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,15 +24,22 @@ export default function SettingsPage() {
   const [whatsAppNumber, setWhatsAppNumber] = useState("");
   const [whatsAppNotifications, setWhatsAppNotifications] = useState(false);
 
+  // Password Change State
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+
+
   // Load settings from localStorage on component mount
   useEffect(() => {
     const storedFullName = localStorage.getItem("settings_fullName");
     if (storedFullName) setFullName(storedFullName);
-    else setFullName("Kunwer Sachdev"); // Default if nothing stored
+    else setFullName("Kunwer Sachdev"); 
 
     const storedEmail = localStorage.getItem("settings_email");
     if (storedEmail) setEmail(storedEmail);
-    else setEmail("kunwer.sachdev@example.com"); // Default if nothing stored
+    else setEmail("kunwer.sachdev@example.com"); 
 
     const storedEmailNotifications = localStorage.getItem("settings_emailNotifications");
     if (storedEmailNotifications) setEmailNotifications(JSON.parse(storedEmailNotifications));
@@ -58,6 +66,23 @@ export default function SettingsPage() {
     localStorage.setItem("settings_whatsAppNumber", whatsAppNumber);
     localStorage.setItem("settings_whatsAppNotifications", JSON.stringify(whatsAppNotifications));
     toast({ title: "Preferences Saved", description: "Your notification preferences have been updated." });
+  };
+
+  const handleChangePassword = () => {
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      toast({ variant: "destructive", title: "Error", description: "Please fill in all password fields." });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      toast({ variant: "destructive", title: "Error", description: "New passwords do not match." });
+      return;
+    }
+    // Simulate password change
+    toast({ title: "Password Changed", description: "Your password has been successfully updated." });
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+    setIsPasswordDialogOpen(false);
   };
 
   return (
@@ -130,13 +155,74 @@ export default function SettingsPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Account Management</CardTitle>
-          <CardDescription>Manage your account security and data.</CardDescription>
+          <CardDescription>Manage your account security.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button variant="outline">Change Password</Button>
-          <Button variant="destructive">Delete Account</Button>
+          <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">Change Password</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Change Password</DialogTitle>
+                <DialogDescription>
+                  Enter your current password and a new password below.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="currentPassword" className="text-right col-span-1">
+                    Current
+                  </Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="newPassword" className="text-right col-span-1">
+                    New
+                  </Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="confirmNewPassword" className="text-right col-span-1">
+                    Confirm
+                  </Label>
+                  <Input
+                    id="confirmNewPassword"
+                    type="password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setCurrentPassword("");
+                    setNewPassword("");
+                    setConfirmNewPassword("");
+                  }}>Cancel</Button>
+                </DialogClose>
+                <Button type="button" onClick={handleChangePassword}>Save Changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+    
