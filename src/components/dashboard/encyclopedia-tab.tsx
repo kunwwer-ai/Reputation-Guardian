@@ -13,19 +13,19 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
   {
     id: "enc1",
     profileId: "profile1",
-    section_title: "Biography Overview", // Updated
-    content_markdown: "Kunwer Sachdev is known for his entrepreneurial ventures in the energy sector.\n\nKey Highlights:\n- Founded Su-Kam Power Systems\n- Contributions to inverter technology in India\n- Speaker on innovation and entrepreneurship", // Updated
+    section_title: "Biography Overview",
+    content_markdown: "Kunwer Sachdev is known for his entrepreneurial ventures in the energy sector.\n\nKey Highlights:\n- Founded Su-Kam Power Systems\n- Contributions to inverter technology in India\n- Speaker on innovation and entrepreneurship",
     source_verified: true,
     disputed_flag: false,
-    source_links: [{ title: "Official Bio Page (Example)", url: "https://example.com/kunwer-sachdev-bio" }],
+    source_links: [{ title: "Kunwer Sachdev - Google Search", url: "https://g.co/kgs/PJj2Uru" }],
   },
   {
     id: "enc2",
     profileId: "profile1",
-    section_title: "Major Achievements & Recognitions", // Updated
-    content_markdown: "Throughout his career, Kunwer Sachdev has received several accolades for his work.\n\n- Ernst & Young Entrepreneur of the Year (Manufacturing) \n- India Today's 'Icons of Tomorrow'\n\nSome public discussions have questioned the early-stage market impact of certain innovations, though largely reviews are positive.", // Updated
+    section_title: "Major Achievements & Recognitions",
+    content_markdown: "Throughout his career, Kunwer Sachdev has received several accolades for his work.\n\n- Ernst & Young Entrepreneur of the Year (Manufacturing) \n- India Today's 'Icons of Tomorrow'\n\nSome public discussions have questioned the early-stage market impact of certain innovations, though largely reviews are positive.",
     source_verified: true,
-    disputed_flag: false, // Adjusted
+    disputed_flag: false,
     source_links: [{ title: "Award News Archive", url: "https://awards.example/ks-archive" }, { title: "Innovation Review Forum", url: "https://forum.example/ks-innovations" }],
   },
 ];
