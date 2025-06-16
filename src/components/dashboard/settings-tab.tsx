@@ -9,9 +9,12 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Edit3, Save, XCircle } from "lucide-react";
+import { User, Edit3, Save, XCircle, BarChart2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
+
+type AnalyticsTimePeriod = "monthly" | "weekly";
 
 export function SettingsTab() {
   const { toast } = useToast();
@@ -36,6 +39,9 @@ export function SettingsTab() {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
+  // Analytics Settings State
+  const [analyticsDefaultTimePeriod, setAnalyticsDefaultTimePeriod] = useState<AnalyticsTimePeriod>("monthly");
+
 
   // Load settings from localStorage on component mount
   useEffect(() => {
@@ -49,7 +55,7 @@ export function SettingsTab() {
 
     const storedAvatar = localStorage.getItem("settings_avatarSrc");
     const initialChar = currentName.charAt(0).toUpperCase() || 'P';
-    const placeholderAvatar = `https://placehold.co/80x80.png?text=${initialChar}`; // 80x80 for profile section
+    const placeholderAvatar = `https://placehold.co/80x80.png?text=${initialChar}`;
     setSavedAvatarSrc(storedAvatar || placeholderAvatar);
      if (!storedAvatar) {
         setPreviewAvatarSrc(null);
@@ -66,12 +72,15 @@ export function SettingsTab() {
 
     const storedWhatsAppNotifications = localStorage.getItem("settings_whatsAppNotifications");
     if (storedWhatsAppNotifications) setWhatsAppNotifications(JSON.parse(storedWhatsAppNotifications));
+
+    const storedAnalyticsTimePeriod = localStorage.getItem("settings_analyticsDefaultTimePeriod") as AnalyticsTimePeriod | null;
+    if (storedAnalyticsTimePeriod) setAnalyticsDefaultTimePeriod(storedAnalyticsTimePeriod);
+
   }, []);
 
   const handleSaveProfile = () => {
     localStorage.setItem("settings_fullName", fullName);
     localStorage.setItem("settings_email", email);
-    // If name changed, and no custom avatar, update placeholder for savedAvatarSrc
     if (!localStorage.getItem("settings_avatarSrc")) {
         const initialChar = fullName.charAt(0).toUpperCase() || 'P';
         setSavedAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
@@ -115,7 +124,9 @@ export function SettingsTab() {
     localStorage.setItem("settings_pushNotifications", JSON.stringify(pushNotifications));
     localStorage.setItem("settings_whatsAppNumber", whatsAppNumber);
     localStorage.setItem("settings_whatsAppNotifications", JSON.stringify(whatsAppNotifications));
-    toast({ title: "Preferences Saved", description: "Your notification preferences have been updated." });
+    localStorage.setItem("settings_analyticsDefaultTimePeriod", analyticsDefaultTimePeriod);
+    toast({ title: "Preferences Saved", description: "Your notification and analytics preferences have been updated." });
+    window.dispatchEvent(new CustomEvent('analyticsSettingsUpdated')); // Notify AnalyticsTab
   };
 
   const handleChangePassword = () => {
@@ -127,7 +138,6 @@ export function SettingsTab() {
       toast({ variant: "destructive", title: "Error", description: "New passwords do not match." });
       return;
     }
-    // Simulate password change
     toast({ title: "Password Changed", description: "Your password has been successfully updated." });
     setCurrentPassword("");
     setNewPassword("");
@@ -196,42 +206,72 @@ export function SettingsTab() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Notification Preferences</CardTitle>
-          <CardDescription>Configure how you receive notifications from the app.</CardDescription>
+          <CardTitle>Preferences</CardTitle>
+          <CardDescription>Configure notifications and default views.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="emailNotificationsTab" className="flex flex-col space-y-1">
-              <span>Email Notifications</span>
-              <span className="font-normal leading-snug text-muted-foreground">
-                Receive updates and alerts via email.
-              </span>
-            </Label>
-            <Switch id="emailNotificationsTab" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+        <CardContent className="space-y-6">
+          <div>
+            <h3 className="text-md font-medium mb-3">Notification Preferences</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="emailNotificationsTab" className="flex flex-col space-y-1">
+                  <span>Email Notifications</span>
+                  <span className="font-normal leading-snug text-muted-foreground">
+                    Receive updates and alerts via email.
+                  </span>
+                </Label>
+                <Switch id="emailNotificationsTab" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="pushNotificationsTab" className="flex flex-col space-y-1">
+                  <span>Push Notifications</span>
+                  <span className="font-normal leading-snug text-muted-foreground">
+                    Get real-time alerts on your device (if supported).
+                  </span>
+                </Label>            
+                <Switch id="pushNotificationsTab" checked={pushNotifications} onCheckedChange={setPushNotifications} />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="whatsAppNumberTab">WhatsApp Number</Label>
+                <Input id="whatsAppNumberTab" type="tel" placeholder="e.g., +1234567890" value={whatsAppNumber} onChange={(e) => setWhatsAppNumber(e.target.value)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="whatsAppNotificationsTab" className="flex flex-col space-y-1">
+                  <span>WhatsApp Notifications</span>
+                  <span className="font-normal leading-snug text-muted-foreground">
+                    Receive updates and alerts via WhatsApp.
+                  </span>
+                </Label>
+                <Switch id="whatsAppNotificationsTab" checked={whatsAppNotifications} onCheckedChange={setWhatsAppNotifications} />
+              </div>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="pushNotificationsTab" className="flex flex-col space-y-1">
-              <span>Push Notifications</span>
-              <span className="font-normal leading-snug text-muted-foreground">
-                Get real-time alerts on your device (if supported).
-              </span>
-            </Label>            
-            <Switch id="pushNotificationsTab" checked={pushNotifications} onCheckedChange={setPushNotifications} />
+          <Separator />
+           <div>
+            <h3 className="text-md font-medium mb-3">Analytics Preferences</h3>
+            <div className="space-y-2">
+              <Label htmlFor="analyticsDefaultTimePeriod">Default Analytics Time Period</Label>
+              <RadioGroup
+                id="analyticsDefaultTimePeriod"
+                value={analyticsDefaultTimePeriod}
+                onValueChange={(value: string) => setAnalyticsDefaultTimePeriod(value as AnalyticsTimePeriod)}
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="monthly" id="analytics-monthly" />
+                  <Label htmlFor="analytics-monthly">Monthly</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="weekly" id="analytics-weekly" />
+                  <Label htmlFor="analytics-weekly">Weekly</Label>
+                </div>
+              </RadioGroup>
+              <p className="text-sm text-muted-foreground">
+                Choose the default time frame for the analytics chart.
+              </p>
+            </div>
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="whatsAppNumberTab">WhatsApp Number</Label>
-            <Input id="whatsAppNumberTab" type="tel" placeholder="e.g., +1234567890" value={whatsAppNumber} onChange={(e) => setWhatsAppNumber(e.target.value)} />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="whatsAppNotificationsTab" className="flex flex-col space-y-1">
-              <span>WhatsApp Notifications</span>
-              <span className="font-normal leading-snug text-muted-foreground">
-                Receive updates and alerts via WhatsApp.
-              </span>
-            </Label>
-            <Switch id="whatsAppNotificationsTab" checked={whatsAppNotifications} onCheckedChange={setWhatsAppNotifications} />
-          </div>
-           <Button onClick={handleSavePreferences}>Save Preferences</Button>
+           <Button onClick={handleSavePreferences}><Save className="mr-2 h-4 w-4" /> Save Preferences</Button>
         </CardContent>
       </Card>
 
