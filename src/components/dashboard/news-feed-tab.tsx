@@ -1,40 +1,94 @@
 
 "use client";
 
-import type { Mention } from "@/types";
+import type { Mention, EncyclopediaSourceLink } from "@/types";
 import { MentionCard } from "@/components/mention-card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { initialMockMentions } from "./mentions-tab"; // Re-use mock data
+import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
+
+// Helper function to transform EncyclopediaSourceLink to Mention
+function transformSourceLinkToMention(
+  sourceLink: EncyclopediaSourceLink,
+  entryId: string,
+  sectionTitle: string
+): Mention {
+  let sourceType: Mention['source_type'] = 'other';
+  if (sectionTitle.toLowerCase().includes("news")) {
+    sourceType = 'news';
+  } else if (sectionTitle.toLowerCase().includes("blog") || sectionTitle.toLowerCase().includes("opinion")) {
+    sourceType = 'social'; // Or 'other', depending on preference
+  } else if (sectionTitle.toLowerCase().includes("youtube") || sectionTitle.toLowerCase().includes("podcast")) {
+    sourceType = 'social'; // Or 'other'
+  } else if (sectionTitle.toLowerCase().includes("search")) {
+    sourceType = 'search_engine';
+  }
+
+  return {
+    id: sourceLink.id, // Use source link's ID
+    profileId: "profile1", // Default or from context if available
+    source_type: sourceLink.source_type_override || sourceType,
+    platform: sourceLink.platform || sectionTitle, // Use specific platform if available, else section title
+    url: sourceLink.url,
+    title: sourceLink.title,
+    content_excerpt: sourceLink.excerpt || "No excerpt available.",
+    sentiment: sourceLink.sentiment,
+    risk_color: sourceLink.risk_color,
+    timestamp: sourceLink.timestamp ? new Date(sourceLink.timestamp) : new Date(),
+    gpt_analysis: sourceLink.gpt_analysis,
+    archived_evidence: sourceLink.archived_evidence,
+    originalEntryId: entryId,
+    originalLinkId: sourceLink.id,
+  };
+}
+
 
 export function NewsFeedTab() {
-  const [newsItems, setNewsItems] = useState<Mention[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { entries, updateLinkInSection } = useEncyclopediaContext();
+  const [isLoading, setIsLoading] = useState(true); // Keep local loading for initial render consistency
+
+  const newsItems = useMemo(() => {
+    const newsSection = entries.find(entry => entry.id === "enc-news"); // Assuming "enc-news" is the ID for "News Articles"
+    if (newsSection && newsSection.source_links) {
+      return newsSection.source_links.map(link => 
+        transformSourceLinkToMention(link, newsSection.id, newsSection.section_title)
+      );
+    }
+    return [];
+  }, [entries]);
 
   useEffect(() => {
-    // Simulate fetching and filtering data
-    const timer = setTimeout(() => {
-      const filteredNews = initialMockMentions.filter(
-        (mention) => mention.source_type === "news"
-      );
-      setNewsItems(filteredNews);
+    // If entries are loaded (even if empty), loading is done for this tab's perspective
+    if (entries) {
       setIsLoading(false);
-    }, 800); // Slightly different delay for visual distinction if needed
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [entries]);
 
-  const handleUpdateNewsItem = (updatedItem: Mention) => {
-    setNewsItems(prevItems => 
-      prevItems.map(item => item.id === updatedItem.id ? updatedItem : item)
-    );
-    // In a real app, you might also update the master list of mentions
-    // if this action should reflect elsewhere.
+
+  const handleUpdateNewsItem = (updatedMention: Mention) => {
+    if (updatedMention.originalEntryId && updatedMention.originalLinkId) {
+      const { originalEntryId, originalLinkId, ...linkDataToUpdate } = updatedMention;
+      
+      // Construct the update object for EncyclopediaSourceLink
+      const sourceLinkUpdate: Partial<EncyclopediaSourceLink> = {
+        title: linkDataToUpdate.title,
+        url: linkDataToUpdate.url,
+        excerpt: linkDataToUpdate.content_excerpt,
+        timestamp: linkDataToUpdate.timestamp,
+        platform: linkDataToUpdate.platform, // This might need careful handling if platform was derived
+        sentiment: linkDataToUpdate.sentiment,
+        risk_color: linkDataToUpdate.risk_color,
+        gpt_analysis: linkDataToUpdate.gpt_analysis,
+        archived_evidence: linkDataToUpdate.archived_evidence,
+      };
+      updateLinkInSection(originalEntryId, originalLinkId, sourceLinkUpdate);
+    }
   };
-
+  
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {[...Array(2)].map((_, i) => ( // Show 2 skeletons for news
+        {[...Array(2)].map((_, i) => (
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-3/4 animate-pulse"></div>
@@ -58,15 +112,12 @@ export function NewsFeedTab() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold font-headline tracking-tight">News Feed</h2>
-        {/* Add filtering or sorting options here in the future if needed */}
       </div>
       
-      {newsItems.length === 0 && !isLoading ? (
-        <p>No news items found for this profile.</p>
+      {newsItems.length === 0 ? (
+        <p>No news items found in the encyclopedia. Add links to the "News Articles" collection in the Encyclopedia tab.</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-          {/* Display news items, possibly with a slightly different card or layout if needed */}
-          {/* For now, reusing MentionCard */}
           {newsItems.map(newsItem => (
             <MentionCard key={newsItem.id} mention={newsItem} onUpdateMention={handleUpdateNewsItem} />
           ))}

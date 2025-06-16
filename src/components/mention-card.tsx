@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Mention, RiskAnalysisResult, ContentSummaryResult } from "@/types";
+import type { Mention, RiskAnalysisResult, ContentSummaryResult, EncyclopediaSourceLink } from "@/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,22 +10,37 @@ import { useState, useTransition } from "react";
 import { analyzeMentionRiskAction, summarizeExcerptAction } from "@/app/actions/mention-actions";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface MentionCardProps {
-  mention: Mention;
+  mention: Mention; // This now includes originalEntryId and originalLinkId
   onUpdateMention: (updatedMention: Mention) => void;
 }
 
-export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
+export function MentionCard({ mention: initialMention, onUpdateMention }: MentionCardProps) {
+  const [mention, setMention] = useState(initialMention); // Local state for immediate UI updates
   const [isAnalyzing, startAnalyzing] = useTransition();
   const [isSummarizing, startSummarizing] = useTransition();
   const { toast } = useToast();
 
   const [showFullExcerpt, setShowFullExcerpt] = useState(false);
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
+  
+  // Evidence state now directly uses mention.archived_evidence
+  const [evidenceNotes, setEvidenceNotes] = useState(mention.archived_evidence?.notes || "");
+  const [evidenceScreenshotUrl, setEvidenceScreenshotUrl] = useState(mention.archived_evidence?.screenshot_url || "");
+  const [evidenceWaybackLink, setEvidenceWaybackLink] = useState(mention.archived_evidence?.wayback_link || "");
+
+
+  // Update local state if initialMention prop changes (e.g., from parent re-render)
+  useEffect(() => {
+    setMention(initialMention);
+    setEvidenceNotes(initialMention.archived_evidence?.notes || "");
+    setEvidenceScreenshotUrl(initialMention.archived_evidence?.screenshot_url || "");
+    setEvidenceWaybackLink(initialMention.archived_evidence?.wayback_link || "");
+  }, [initialMention]);
 
   const handleAnalyzeRisk = async () => {
     startAnalyzing(async () => {
@@ -37,16 +52,19 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
           platform: mention.platform,
         });
         
-        let riskColor: '🔴' | '🟡' | '🟢' = '🟡';
+        let riskColor: Mention['risk_color'] = '🟡';
         if (result.riskLevel === 'RED') riskColor = '🔴';
         else if (result.riskLevel === 'GREEN') riskColor = '🟢';
 
-        onUpdateMention({
-          ...mention,
+        const updatedMentionData: Partial<Mention> = {
           risk_color: riskColor,
-          sentiment: result.sentiment,
+          sentiment: result.sentiment as Mention['sentiment'],
           gpt_analysis: result.analysis,
-        });
+        };
+        
+        const updatedFullMention = { ...mention, ...updatedMentionData };
+        setMention(updatedFullMention); // Update local state immediately
+        onUpdateMention(updatedFullMention); // Propagate to parent (and then context)
 
         toast({
           title: "Analysis Complete",
@@ -68,7 +86,14 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
         const result: ContentSummaryResult = await summarizeExcerptAction({
           contentExcerpt: mention.content_excerpt,
         });
-        onUpdateMention({ ...mention, content_excerpt: result.summary }); // Or store summary in a new field
+        
+        const updatedMentionData: Partial<Mention> = {
+            content_excerpt: result.summary,
+        };
+        const updatedFullMention = { ...mention, ...updatedMentionData };
+        setMention(updatedFullMention); // Update local state immediately
+        onUpdateMention(updatedFullMention); // Propagate to parent
+
         toast({
           title: "Summarization Complete",
           description: "Content excerpt has been summarized.",
@@ -85,7 +110,7 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
 
   const getSentimentBadgeVariant = (sentiment?: 'positive' | 'negative' | 'neutral') => {
     switch (sentiment) {
-      case 'positive': return 'default'; // Blueish (primary)
+      case 'positive': return 'default'; 
       case 'negative': return 'destructive';
       case 'neutral': return 'secondary';
       default: return 'outline';
@@ -106,17 +131,21 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
     return text.substring(0, maxLength) + "...";
   };
 
-
-  const [evidence, setEvidence] = useState(mention.archived_evidence || {});
-
   const handleSaveEvidence = () => {
-    onUpdateMention({ ...mention, archived_evidence: evidence });
+    const updatedEvidence = {
+        notes: evidenceNotes,
+        screenshot_url: evidenceScreenshotUrl,
+        wayback_link: evidenceWaybackLink,
+    };
+    const updatedFullMention = { ...mention, archived_evidence: updatedEvidence };
+    setMention(updatedFullMention); // Update local state
+    onUpdateMention(updatedFullMention); // Propagate to parent
     toast({ title: "Evidence Saved", description: "Archived evidence has been updated." });
   };
 
 
   return (
-    <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
@@ -124,7 +153,7 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
             <CardDescription className="text-sm">
               <a href={mention.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
                 {mention.platform} <ExternalLink className="h-3 w-3" />
-              </a> - {new Date(mention.timestamp).toLocaleDateString()}
+              </a> - {new Date(mention.timestamp).toLocaleDateString()} ({mention.source_type})
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -135,7 +164,7 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 flex-grow">
         <div>
           <p className="text-sm text-foreground leading-relaxed">
             {truncateText(mention.content_excerpt, 200, showFullExcerpt)}
@@ -161,8 +190,8 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2 justify-between">
-        <div className="flex gap-2">
+      <CardFooter className="flex flex-wrap gap-2 justify-between items-center pt-4">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={handleAnalyzeRisk} disabled={isAnalyzing}>
             {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BarChartBig className="mr-2 h-4 w-4" />}
             Analyze Risk
@@ -181,28 +210,31 @@ export function MentionCard({ mention, onUpdateMention }: MentionCardProps) {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Archive Evidence for: {mention.title}</DialogTitle>
+              <DialogDescription>Store URLs for screenshots, Wayback Machine links, and other notes.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="screenshot_url" className="text-right">Screenshot URL</Label>
-                <Input id="screenshot_url" value={evidence.screenshot_url || ""} onChange={(e) => setEvidence({...evidence, screenshot_url: e.target.value})} className="col-span-3" placeholder="https://example.com/image.png" />
+              <div className="space-y-1">
+                <Label htmlFor="screenshot_url">Screenshot URL</Label>
+                <Input id="screenshot_url" value={evidenceScreenshotUrl} onChange={(e) => setEvidenceScreenshotUrl(e.target.value)} placeholder="https://example.com/image.png" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="wayback_link" className="text-right">Wayback Link</Label>
-                <Input id="wayback_link" value={evidence.wayback_link || ""} onChange={(e) => setEvidence({...evidence, wayback_link: e.target.value})} className="col-span-3" placeholder="https://web.archive.org/..." />
+              <div className="space-y-1">
+                <Label htmlFor="wayback_link">Wayback Machine Link</Label>
+                <Input id="wayback_link" value={evidenceWaybackLink} onChange={(e) => setEvidenceWaybackLink(e.target.value)} placeholder="https://web.archive.org/..." />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="notes" className="text-right">Notes</Label>
-                <Textarea id="notes" value={evidence.notes || ""} onChange={(e) => setEvidence({...evidence, notes: e.target.value})} className="col-span-3" placeholder="Additional notes..." />
+              <div className="space-y-1">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea id="notes" value={evidenceNotes} onChange={(e) => setEvidenceNotes(e.target.value)} placeholder="Additional notes about this evidence..." />
               </div>
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="secondary">Cancel</Button>
+                <Button type="button" variant="outline">Cancel</Button>
               </DialogClose>
-              <DialogClose asChild>
-                <Button type="button" onClick={handleSaveEvidence}>Save Evidence</Button>
-              </DialogClose>
+                <Button type="button" onClick={() => {
+                    handleSaveEvidence();
+                    const closeButton = document.querySelector('[data-radix-dialog-default-open="false"]'); // Find a way to close dialog
+                    if (closeButton instanceof HTMLElement) closeButton.click();
+                }}>Save Evidence</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
