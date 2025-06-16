@@ -86,10 +86,16 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
     if (!searchQuery) {
       return entries;
     }
+    const lowercasedQuery = searchQuery.toLowerCase();
     return entries.filter(entry =>
-      entry.section_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      entry.content_markdown.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (entry.source_links && entry.source_links.some(link => link.title.toLowerCase().includes(searchQuery.toLowerCase()) || link.url.toLowerCase().includes(searchQuery.toLowerCase())))
+      entry.section_title.toLowerCase().includes(lowercasedQuery) ||
+      entry.content_markdown.toLowerCase().includes(lowercasedQuery) ||
+      (entry.source_links && entry.source_links.some(link => 
+        link.title.toLowerCase().includes(lowercasedQuery) || 
+        link.url.toLowerCase().includes(lowercasedQuery) ||
+        (link.excerpt && link.excerpt.toLowerCase().includes(lowercasedQuery)) ||
+        (link.platform && link.platform.toLowerCase().includes(lowercasedQuery))
+      ))
     );
   }, [entries, searchQuery]);
   
@@ -179,14 +185,16 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
         />
       </div>
       
-      {filteredEntries.length === 0 ? (
+      {filteredEntries.length === 0 && entries.length > 0 ? ( // Show if search yields no results but there are entries
          <Card className="shadow-lg">
           <CardContent className="pt-6">
-            {searchQuery ? (
-                <p>No link collections match your search for "{searchQuery}".</p>
-            ) : (
-                <p>No link collections have been created yet. Click "Add Collection" to get started.</p>
-            )}
+             <p>No link collections match your search for "{searchQuery}". Try a different keyword.</p>
+          </CardContent>
+        </Card>
+      ) : filteredEntries.length === 0 && entries.length === 0 ? ( // Show if no entries at all
+         <Card className="shadow-lg">
+          <CardContent className="pt-6">
+             <p>No link collections have been created yet. Click "Add Collection" to get started.</p>
           </CardContent>
         </Card>
       ) : (
