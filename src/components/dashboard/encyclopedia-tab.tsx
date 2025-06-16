@@ -11,15 +11,29 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 
-const LOCAL_STORAGE_KEY = "encyclopediaEntries_v5"; // Updated Key
+const LOCAL_STORAGE_KEY = "encyclopediaEntries_v6"; // Updated Key for restructuring
 
 // Updated Mock Encyclopedia Entries - Focused on Search Link Collection
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
   {
-    id: "enc3", // Google Search Examples
+    id: "web-search-monitoring",
     profileId: "profile1",
-    section_title: "Google Search Examples for 'Kunwer Sachdev'",
-    content_markdown: "This section is specifically for collecting example links found on Google when searching for 'Kunwer Sachdev' and its common variations (e.g., Kunwar Sachdeva, Kuwer Sachdeva, Kumar Sachdeva). In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find.",
+    section_title: "Web Search Monitoring - Kunwer Sachdev & Variations",
+    content_markdown: "This section is for collecting links from various search engines (Google, Bing, DuckDuckGo, etc.) for 'Kunwer Sachdev' and its common variations (e.g., Kunwar Sachdeva, Kuwer Sachdeva, Kumar Sachdeva). Use 'Add Link' to manually add URLs found.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [ 
+      { title: "Google Search: Kunwer Sachdev", url: "https://www.google.com/search?q=Kunwer+Sachdev" },
+      { title: "Bing Search: Kunwar Sachdeva", url: "https://www.bing.com/search?q=Kunwar+Sachdeva" },
+      { title: "DuckDuckGo Search: Kuwer Sachdeva", url: "https://duckduckgo.com/?q=Kuwer+Sachdeva" },
+      { title: "Example Blog Post about Kumar Sachdeva", url: "https://exampleblog.com/kumar-sachdeva-insights" },
+    ],
+  },
+  {
+    id: "google-deep-dive",
+    profileId: "profile1",
+    section_title: "Google Search Deep Dive - 'Kunwer Sachdev'",
+    content_markdown: "Dedicated collection of Google Search results specifically for the primary name 'Kunwer Sachdev'. Add more findings using the 'Add Link' button below. These links also contribute to the consolidated list at the top.",
     source_verified: false,
     disputed_flag: false,
     source_links: [ 
@@ -43,26 +57,6 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
       { title: "Google Shopping: Products by Kunwer Sachdev's Company (Example)", url: "https://www.google.com/search?q=Su-Kam+inverters&tbm=shop" },
       { title: "Google Maps: Su-Kam Power Systems HQ (Example)", url: "https://www.google.com/maps/search/Su-Kam+Power+Systems+Headquarters" }
     ],
-  },
-  {
-    id: "enc-google-news", // Google News Mentions
-    profileId: "profile1",
-    section_title: "Google News Mentions for 'Kunwer Sachdev'",
-    content_markdown: "Example news articles related to 'Kunwer Sachdev', typically found via Google News. In a live system, these might be periodically fetched using Google's official APIs. Use the 'Add Link' button on this card to add more news links.",
-    source_verified: false,
-    disputed_flag: false,
-    source_links: [
-      { title: "Economic Times: Kunwer Sachdev on Renewable Energy Trends", url: "https://economictimes.indiatimes.com/news/company/corporate-trends/kunwer-sachdev-on-renewable-energy-trends/articleshow/example1.cms" },
-      { title: "Business Standard: Su-Kam founder Kunwer Sachdev invests in new tech startup", url: "https://www.business-standard.com/article/companies/su-kam-founder-kunwer-sachdev-invests-in-new-tech-startup-example.html" },
-      { title: "Forbes India: The Inverter Man's Next Chapter: Kunwer Sachdev", url: "https://www.forbesindia.com/article/example-feature/the-inverter-mans-next-chapter-kunwer-sachdev/example.html" },
-      { title: "Times of India: Innovation in Power Backup - A Talk by Kunwer Sachdev", url: "https://timesofindia.indiatimes.com/business/india-business/innovation-in-power-backup-a-talk-by-kunwer-sachdev/articleshow/example2.cms" },
-      { title: "YourStory: From Su-Kam to Solar: Kunwer Sachdev's Journey", url: "https://yourstory.com/2023/05/kunwer-sachdev-journey-sukam-solar-example" },
-      { title: "Livemint: Kunwer Sachdev to speak at Global Entrepreneurship Summit", url: "https://www.livemint.com/companies/news/kunwer-sachdev-to-speak-at-global-entrepreneurship-summit-example.html" },
-      { title: "Reuters: Indian innovator Kunwer Sachdev awarded for lifetime achievement", url: "https://www.reuters.com/article/india-business-kunwersachdev-award-example/idUSKBNEXAMPLE" },
-      { title: "Bloomberg Quint: Market Disruption and Kunwer Sachdev's Strategies", url: "https://www.bloombergquint.com/business/market-disruption-and-kunwer-sachdevs-strategies-example" },
-      { title: "The Hindu Business Line: Powering a Nation: Kunwer Sachdev's Vision", url: "https://www.thehindubusinessline.com/companies/powering-a-nation-kunwer-sachdevs-vision/articleexample.html" },
-      { title: "NDTV Profit: A look into Kunwer Sachdev's philanthropic activities", url: "https://www.ndtv.com/business/profit/a-look-into-kunwer-sachdevs-philanthropic-activities-example-23456" }
-    ]
   }
 ];
 
@@ -115,8 +109,8 @@ export function EncyclopediaTab() {
     const newEntry: EncyclopediaEntry = {
       id: `enc${Date.now()}`, 
       profileId: "profile1",
-      section_title: "New Custom Section (e.g., Bing Search)",
-      content_markdown: "Enter content here, or use this section to collect links from a specific source...",
+      section_title: "New Search Collection (e.g., Bing)",
+      content_markdown: "Enter a description or use this section to collect links from a specific source (e.g., Bing search results for 'Kunwer Sachdev').",
       source_verified: false,
       disputed_flag: false,
       source_links: [],
@@ -124,7 +118,7 @@ export function EncyclopediaTab() {
     const newEntries = [...entries, newEntry];
     setEntries(newEntries);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newEntries));
-    toast({ title: "New Section Added", description: "A new encyclopedia section has been created." });
+    toast({ title: "New Collection Added", description: "A new link collection section has been created." });
   };
 
   const filteredEntries = useMemo(() => {
@@ -180,7 +174,7 @@ export function EncyclopediaTab() {
         <CardHeader>
           <CardTitle className="text-xl font-headline">Consolidated Unique Source Links</CardTitle>
           <CardDescription>
-            This section aggregates all unique URLs from your encyclopedia entries (e.g., Google Search, Google News, etc.). Duplicates are automatically removed.
+            This section aggregates all unique URLs from your link collections below (e.g., Google Search, Web Monitoring, etc.). Duplicates are automatically removed.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -206,14 +200,14 @@ export function EncyclopediaTab() {
               </ul>
             </ScrollArea>
           ) : (
-            <p className="text-muted-foreground">No unique source links found across all sections.</p>
+            <p className="text-muted-foreground">No unique source links found across all collections.</p>
           )}
         </CardContent>
       </Card>
 
       <div className="flex justify-between items-center pt-4">
-        <h2 className="text-2xl font-semibold font-headline tracking-tight">Search Link Collections</h2>
-        <Button onClick={handleAddEntry} aria-label="Add new encyclopedia section">
+        <h2 className="text-2xl font-semibold font-headline tracking-tight">Link Collections</h2>
+        <Button onClick={handleAddEntry} aria-label="Add new link collection">
           <PlusCircle className="mr-2 h-4 w-4" /> Add Collection (e.g., for Bing)
         </Button>
       </div>
