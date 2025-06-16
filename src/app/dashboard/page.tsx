@@ -9,7 +9,7 @@ import { EncyclopediaTab } from "@/components/dashboard/encyclopedia-tab";
 import { NewsFeedTab } from "@/components/dashboard/news-feed-tab";
 import { ContentGenerationTab } from "@/components/dashboard/content-generation-tab";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // use useRouter instead of useSearchParams for hash manipulation
+import { useRouter } from "next/navigation"; 
 
 // Placeholder for RiskAssessmentTool
 function RiskAssessmentToolPlaceholder() {
@@ -20,47 +20,43 @@ const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-
 
 export default function DashboardPage() {
   const router = useRouter();
-  // Initialize activeTab state, trying to read from hash first, else default to "overview"
-  const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window !== "undefined") {
-      const hash = window.location.hash.substring(1);
-      if (hash && validTabs.includes(hash)) {
-        return hash;
-      }
-    }
-    return "overview";
-  });
+  // Initialize activeTab to a default. Server and initial client render will use this.
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
-    // This function syncs the active tab state with the current URL hash
+    // This function syncs the active tab state with the current URL hash.
+    // It runs only on the client, after initial hydration.
     const syncTabWithHash = () => {
       const currentHash = window.location.hash.substring(1);
-      if (validTabs.includes(currentHash)) {
-        setActiveTab(currentHash);
+      if (currentHash && validTabs.includes(currentHash)) {
+        if (activeTab !== currentHash) { // Only update if state is different
+          setActiveTab(currentHash);
+        }
       } else {
-        // If hash is empty or invalid, default to "overview"
-        setActiveTab("overview");
-        // Optionally, if you want to enforce the URL to show #overview for /dashboard
+        // If hash is empty, invalid, or doesn't match a tab, default to "overview"
+        if (activeTab !== "overview") { // Only update if state is different
+            setActiveTab("overview");
+        }
+        // Optionally, normalize URL if on /dashboard and hash is not #overview or empty
+        // This helps keep the URL clean if an invalid hash was manually entered.
         if (window.location.pathname === '/dashboard' && currentHash !== 'overview' && currentHash !== '') {
            router.replace('/dashboard#overview', { scroll: false });
-        } else if (window.location.pathname === '/dashboard' && currentHash === '') {
-           // If on /dashboard and hash is truly empty, no need to push, already defaulting to overview state
         }
       }
     };
 
-    syncTabWithHash(); // Initial sync on component mount
+    syncTabWithHash(); // Sync on initial client mount
 
     window.addEventListener('hashchange', syncTabWithHash, false);
     return () => {
       window.removeEventListener('hashchange', syncTabWithHash, false);
     };
-  }, [router]); // router is a stable dependency
+  }, [router, activeTab]); // Rerun if router changes or activeTab is changed by handleTabChange
 
   const handleTabChange = (value: string) => {
     // This is called when a user clicks on a TabsTrigger component
-    setActiveTab(value);
-    router.push(`/dashboard#${value}`, { scroll: false }); // Update URL, hashchange listener will also fire
+    setActiveTab(value); // Update state first
+    router.push(`/dashboard#${value}`, { scroll: false }); // Update URL, hashchange listener in useEffect will also fire
   };
   
   return (
