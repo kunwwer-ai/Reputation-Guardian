@@ -1,12 +1,42 @@
 
+'use client';
+
 import type { ReactNode } from 'react';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/icons';
 import { UserNav } from '@/components/user-nav';
 import Link from 'next/link';
 import { Home, FileText, Briefcase, BookOpen, Settings, BotMessageSquare, PencilRuler, Newspaper } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname(); // Gets the current path, e.g., /dashboard or /dashboard/settings
+  const [currentHash, setCurrentHash] = useState<string>('');
+
+  useEffect(() => {
+    // Function to get and set the current hash
+    const updateHashState = () => {
+      setCurrentHash(window.location.hash.substring(1));
+    };
+
+    updateHashState(); // Set the initial hash state
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', updateHashState, false);
+
+    // Cleanup listener on component unmount
+    return () => {
+      window.removeEventListener('hashchange', updateHashState, false);
+    };
+  }, [pathname]); // Re-run effect if pathname changes (e.g., navigating between /dashboard and /dashboard/settings)
+
+  const isSettingsPage = pathname === '/dashboard/settings';
+  const isDashboardPage = pathname === '/dashboard';
+
+  // Determine active state for the main "Dashboard" link (overview tab)
+  const dashboardOverviewActive = isDashboardPage && (currentHash === '' || currentHash === 'overview');
+
   return (
     <SidebarProvider defaultOpen>
       <Sidebar variant="sidebar" collapsible="icon" className="border-r">
@@ -19,7 +49,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={false} tooltip="Dashboard">{/* Assuming default active based on page, not layout */}
+              <SidebarMenuButton asChild isActive={dashboardOverviewActive} tooltip="Dashboard">
                 <Link href="/dashboard">
                   <Home />
                   <span>Dashboard</span>
@@ -27,49 +57,56 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Mentions"><Link href="/dashboard#mentions">
+              <SidebarMenuButton asChild isActive={isDashboardPage && currentHash === 'mentions'} tooltip="Mentions">
+                <Link href="/dashboard#mentions">
                   <FileText />
                   <span>Mentions</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="News Feed"><Link href="/dashboard#news-feed">
+              <SidebarMenuButton asChild isActive={isDashboardPage && currentHash === 'news-feed'} tooltip="News Feed">
+                <Link href="/dashboard#news-feed">
                   <Newspaper />
                   <span>News Feed</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Legal Cases"><Link href="/dashboard#legal-cases">
+              <SidebarMenuButton asChild isActive={isDashboardPage && currentHash === 'legal-cases'} tooltip="Legal Cases">
+                <Link href="/dashboard#legal-cases">
                   <Briefcase />
                   <span>Legal Cases</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Encyclopedia"><Link href="/dashboard#encyclopedia">
+              <SidebarMenuButton asChild isActive={isDashboardPage && currentHash === 'encyclopedia'} tooltip="Encyclopedia">
+                <Link href="/dashboard#encyclopedia">
                   <BookOpen />
                   <span>Encyclopedia</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Risk Assessment Tool"><Link href="/dashboard#risk-assessment">
+              <SidebarMenuButton asChild isActive={isDashboardPage && currentHash === 'risk-assessment'} tooltip="Risk Assessment Tool">
+                <Link href="/dashboard#risk-assessment">
                   <BotMessageSquare />
                   <span>Risk Assessment</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Content Generation"><Link href="/dashboard#content-generation">
+              <SidebarMenuButton asChild isActive={isDashboardPage && currentHash === 'content-generation'} tooltip="Content Generation">
+                <Link href="/dashboard#content-generation">
                   <PencilRuler />
                   <span>Content Generation</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Settings"><Link href="/dashboard/settings">
+              <SidebarMenuButton asChild isActive={isSettingsPage} tooltip="Settings">
+                <Link href="/dashboard/settings">
                   <Settings />
                   <span>Settings</span>
                 </Link>
