@@ -145,7 +145,7 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
           <Label htmlFor={`disputed-${currentEntry.id}`} className="text-sm">Disputed Flag</Label>
         </div>
 
-        {currentEntry.id === "enc3" && (
+        {(currentEntry.id === "enc3" || currentEntry.id === "enc-google-news") && (
           <Dialog open={isAddLinkDialogOpen} onOpenChange={setIsAddLinkDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
@@ -154,9 +154,9 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Source Link</DialogTitle>
+                <DialogTitle>Add New Link to "{currentEntry.section_title}"</DialogTitle>
                 <DialogDescription>
-                  Enter the title and URL for the "Online Search Presence" section.
+                  Enter the title and URL for the link you want to add to this section.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -218,3 +218,4 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     </Card>
   );
 }
+
