@@ -21,7 +21,7 @@ const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-
 export default function DashboardPage() {
   const router = useRouter();
   // Initialize activeTab to a default. Server and initial client render will use this.
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("overview"); 
 
   useEffect(() => {
     // This function syncs the active tab state with the current URL hash.
@@ -29,16 +29,13 @@ export default function DashboardPage() {
     const syncTabWithHash = () => {
       const currentHash = window.location.hash.substring(1);
       if (currentHash && validTabs.includes(currentHash)) {
-        if (activeTab !== currentHash) { // Only update if state is different
+        if (activeTab !== currentHash) { 
           setActiveTab(currentHash);
         }
       } else {
-        // If hash is empty, invalid, or doesn't match a tab, default to "overview"
-        if (activeTab !== "overview") { // Only update if state is different
+        if (activeTab !== "overview") { 
             setActiveTab("overview");
         }
-        // Optionally, normalize URL if on /dashboard and hash is not #overview or empty
-        // This helps keep the URL clean if an invalid hash was manually entered.
         if (window.location.pathname === '/dashboard' && currentHash !== 'overview' && currentHash !== '') {
            router.replace('/dashboard#overview', { scroll: false });
         }
@@ -51,18 +48,17 @@ export default function DashboardPage() {
     return () => {
       window.removeEventListener('hashchange', syncTabWithHash, false);
     };
-  }, [router, activeTab]); // Rerun if router changes or activeTab is changed by handleTabChange
+  }, [router, activeTab]); 
 
   const handleTabChange = (value: string) => {
-    // This is called when a user clicks on a TabsTrigger component
-    setActiveTab(value); // Update state first
-    router.push(`/dashboard#${value}`, { scroll: false }); // Update URL, hashchange listener in useEffect will also fire
+    setActiveTab(value); 
+    router.push(`/dashboard#${value}`, { scroll: false }); 
   };
   
   return (
     <div className="flex flex-col h-full">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-grow flex flex-col">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-7 gap-1 mb-6 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-7 gap-1 mb-6 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10 p-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="mentions">Mentions</TabsTrigger>
           <TabsTrigger value="legal-cases">Legal Cases</TabsTrigger>
