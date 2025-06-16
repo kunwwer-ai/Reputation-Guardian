@@ -1,7 +1,7 @@
 
 import type { EncyclopediaEntry } from "@/types";
 
-export const LOCAL_STORAGE_KEY_ENCYCLOPEDIA = "encyclopediaEntries_v9_centralized";
+export const LOCAL_STORAGE_KEY_ENCYCLOPEDIA = "encyclopediaEntries_v9_social";
 
 // Updated Mock Encyclopedia Entries - Category-based structure
 export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -70,6 +70,51 @@ export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     profileId: "profile1",
     section_title: "Podcast Appearances & Mentions - Kunwer Sachdev",
     content_markdown: "Collect links to podcast episodes where Kunwer Sachdev is a guest or is significantly discussed.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [],
+  },
+  {
+    id: "enc-facebook",
+    profileId: "profile1",
+    section_title: "Facebook Mentions - Kunwer Sachdev",
+    content_markdown: "Collect links to Facebook posts, pages, or groups discussing Kunwer Sachdev.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [],
+  },
+  {
+    id: "enc-twitter-x",
+    profileId: "profile1",
+    section_title: "Twitter (X) Mentions - Kunwer Sachdev",
+    content_markdown: "Collect links to tweets, profiles, or threads related to Kunwer Sachdev on Twitter (X).",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [],
+  },
+  {
+    id: "enc-linkedin",
+    profileId: "profile1",
+    section_title: "LinkedIn Mentions - Kunwer Sachdev",
+    content_markdown: "Collect links to LinkedIn posts, articles, or profiles relevant to Kunwer Sachdev.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [],
+  },
+  {
+    id: "enc-instagram",
+    profileId: "profile1",
+    section_title: "Instagram Mentions - Kunwer Sachdev",
+    content_markdown: "Collect links to Instagram posts, reels, or profiles featuring Kunwer Sachdev.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [],
+  },
+  {
+    id: "enc-other-social",
+    profileId: "profile1",
+    section_title: "Other Social Media Platforms - Kunwer Sachdev",
+    content_markdown: "Collect links from other social media platforms (e.g., Reddit, Quora, TikTok) that mention Kunwer Sachdev.",
     source_verified: false,
     disputed_flag: false,
     source_links: [],
