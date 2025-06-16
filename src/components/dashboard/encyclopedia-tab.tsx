@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 
-const LOCAL_STORAGE_KEY = "encyclopediaEntries_v3"; // Updated key
+const LOCAL_STORAGE_KEY = "encyclopediaEntries_v4"; // Updated key
 
 // Updated Mock Encyclopedia Entries for Kunwer Sachdev (person)
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -39,11 +39,11 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
   {
     id: "enc3",
     profileId: "profile1",
-    section_title: "Google Search Examples for 'Kunwer Sachdev'", // UPDATED TITLE
-    content_markdown: "This section is for collecting example links found on Google when searching for 'Kunwer Sachdev'. In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find for 'Kunwer Sachdev'. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.", // UPDATED DESCRIPTION
+    section_title: "Google Search Examples for 'Kunwer Sachdev'",
+    content_markdown: "This section is for collecting example links found on Google when searching for 'Kunwer Sachdev'. In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find for 'Kunwer Sachdev'. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.",
     source_verified: false,
     disputed_flag: false,
-    source_links: [ // CURATED GOOGLE-LIKE LINKS
+    source_links: [ 
       { title: "Google Search: Kunwer Sachdev", url: "https://www.google.com/search?q=Kunwer+Sachdev" },
       { title: "Google Search Result: Forbes Profile - Kunwer Sachdev", url: "https://www.forbes.com/profile/kunwer-sachdev-example" },
       { title: "Google Search Result: TechCrunch Interview - Kunwer Sachdev", url: "https://techcrunch.com/2023/01/15/kunwer-sachdev-interview-example" },
@@ -59,12 +59,31 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
       { title: "Google Patents: Patent by Kunwer Sachdev", url: "https://patents.google.com/patent/US1234567B2/en?assignee=Kunwer+Sachdev&oq=Kunwer+Sachdev" },
       { title: "Google Scholar: Impact of Su-Kam Study Example", url: "https://scholar.google.com/scholar?q=impact+of+su-kam+kunwer+sachdev" },
       { title: "Google Search Result: LinkedIn Profile - Kunwer Sachdev", url: "https://www.linkedin.com/in/kunwersachdevexample/" },
-      { title: "Google News: Kunwer Sachdev on Renewable Energy", url: "https://news.google.com/articles/CBMiQGh0dHBzOi8vbmV3cy5leGFtcGxlLmNvbS9rdW53ZXItc2FjaGRldi1yZW5ld2FibGUtZW5lcmd5P2hsPWVuLUlOJmdsPUlO" },
       { title: "Google Images: Kunwer Sachdev Photos", url: "https://www.google.com/search?q=Kunwer+Sachdev&tbm=isch" },
       { title: "Google Books: 'Entrepreneurship Journey' by Kunwer Sachdev", url: "https://books.google.com/books?id=exampleBookId&q=Kunwer+Sachdev" },
       { title: "Google Shopping: Products by Kunwer Sachdev's Company (Example)", url: "https://www.google.com/search?q=Su-Kam+inverters&tbm=shop" },
       { title: "Google Maps: Su-Kam Power Systems HQ (Example)", url: "https://www.google.com/maps/search/Su-Kam+Power+Systems+Headquarters" }
     ],
+  },
+  {
+    id: "enc-google-news",
+    profileId: "profile1",
+    section_title: "Google News Mentions for 'Kunwer Sachdev'",
+    content_markdown: "Example news articles related to 'Kunwer Sachdev', typically found via Google News. In a live system, these might be periodically fetched using Google's official APIs (e.g., Custom Search JSON API configured for news).",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [
+      { title: "Economic Times: Kunwer Sachdev on Renewable Energy Trends", url: "https://economictimes.indiatimes.com/news/company/corporate-trends/kunwer-sachdev-on-renewable-energy-trends/articleshow/example1.cms" },
+      { title: "Business Standard: Su-Kam founder Kunwer Sachdev invests in new tech startup", url: "https://www.business-standard.com/article/companies/su-kam-founder-kunwer-sachdev-invests-in-new-tech-startup-example.html" },
+      { title: "Forbes India: The Inverter Man's Next Chapter: Kunwer Sachdev", url: "https://www.forbesindia.com/article/example-feature/the-inverter-mans-next-chapter-kunwer-sachdev/example.html" },
+      { title: "Times of India: Innovation in Power Backup - A Talk by Kunwer Sachdev", url: "https://timesofindia.indiatimes.com/business/india-business/innovation-in-power-backup-a-talk-by-kunwer-sachdev/articleshow/example2.cms" },
+      { title: "YourStory: From Su-Kam to Solar: Kunwer Sachdev's Journey", url: "https://yourstory.com/2023/05/kunwer-sachdev-journey-sukam-solar-example" },
+      { title: "Livemint: Kunwer Sachdev to speak at Global Entrepreneurship Summit", url: "https://www.livemint.com/companies/news/kunwer-sachdev-to-speak-at-global-entrepreneurship-summit-example.html" },
+      { title: "Reuters: Indian innovator Kunwer Sachdev awarded for lifetime achievement", url: "https://www.reuters.com/article/india-business-kunwersachdev-award-example/idUSKBNEXAMPLE" },
+      { title: "Bloomberg Quint: Market Disruption and Kunwer Sachdev's Strategies", url: "https://www.bloombergquint.com/business/market-disruption-and-kunwer-sachdevs-strategies-example" },
+      { title: "The Hindu Business Line: Powering a Nation: Kunwer Sachdev's Vision", url: "https://www.thehindubusinessline.com/companies/powering-a-nation-kunwer-sachdevs-vision/articleexample.html" },
+      { title: "NDTV Profit: A look into Kunwer Sachdev's philanthropic activities", url: "https://www.ndtv.com/business/profit/a-look-into-kunwer-sachdevs-philanthropic-activities-example-23456" }
+    ]
   }
 ];
 
@@ -141,7 +160,7 @@ export function EncyclopediaTab() {
             <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
           </CardContent>
         </Card>
-        {[...Array(2)].map((_, i) => ( 
+        {[...Array(3)].map((_, i) => ( // Show 3 skeletons now with the new section
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
@@ -169,7 +188,7 @@ export function EncyclopediaTab() {
           <CardTitle className="text-xl font-headline">Consolidated Unique Source Links</CardTitle>
           <CardDescription>
             This section aggregates all unique URLs from your encyclopedia entries. 
-            Currently, it will primarily show links from the "Google Search Examples for 'Kunwer Sachdev'" section.
+            Currently, it will primarily show links from the "Google Search Examples" and "Google News Mentions" sections.
             Duplicates are automatically removed.
           </CardDescription>
         </CardHeader>
