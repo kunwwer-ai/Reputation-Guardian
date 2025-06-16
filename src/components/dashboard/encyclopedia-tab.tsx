@@ -4,11 +4,11 @@
 import type { EncyclopediaEntry } from "@/types";
 import { EncyclopediaCard } from "@/components/encyclopedia-card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Link as LinkIcon, ExternalLink } from "lucide-react"; // Added LinkIcon, ExternalLink
+import { PlusCircle, Link as LinkIcon, ExternalLink } from "lucide-react"; 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card"; // Added CardDescription
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card"; 
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area"; // Added ScrollArea
+import { ScrollArea } from "@/components/ui/scroll-area"; 
 
 const LOCAL_STORAGE_KEY = "encyclopediaEntries";
 
@@ -45,6 +45,21 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     disputed_flag: false,
     source_links: [
       { title: "Kunwer Sachdev - Google Search", url: "https://www.google.com/search?q=Kunwer+Sachdev" },
+      { title: "Kunwer Sachdev - Forbes Profile", url: "https://www.forbes.com/profile/kunwer-sachdev-example" },
+      { title: "Interview with Kunwer Sachdev - TechCrunch", url: "https://techcrunch.com/2023/01/15/kunwer-sachdev-interview-example" },
+      { title: "Kunwer Sachdev's Innovations - Wired", url: "https://www.wired.com/story/kunwer-sachdev-innovations-example" },
+      { title: "The Su-Kam Story by Kunwer Sachdev - Economic Times", url: "https://economictimes.indiatimes.com/kunwer-sachdev-sukam-story-example" },
+      { title: "Kunwer Sachdev on Entrepreneurship - YourStory", url: "https://yourstory.com/2022/11/kunwer-sachdev-entrepreneurship-tips-example" },
+      { title: "Kunwer Sachdev: A Visionary Leader - Business Standard", url: "https://www.business-standard.com/article/companies/kunwer-sachdev-visionary-leader-example-12345.html" },
+      { title: "Understanding Inverter Technology with Kunwer Sachdev - IEEE Spectrum", url: "https://spectrum.ieee.org/kunwer-sachdev-inverter-technology-example" },
+      { title: "Kunwer Sachdev's Philanthropic Work - The Better India", url: "https://www.thebetterindia.com/kunwer-sachdev-philanthropy-example/" },
+      { title: "Book Review: 'The Inverter Man' by Kunwer Sachdev - Goodreads", url: "https://www.goodreads.com/book/show/12345678-the-inverter-man-kunwer-sachdev-example" },
+      { title: "Kunwer Sachdev YouTube Channel - Example", url: "https://www.youtube.com/channel/UCexampleKunwerSachdev" },
+      { title: "Kunwer Sachdev - Wikipedia (Draft Example)", url: "https://en.wikipedia.org/wiki/Draft:Kunwer_Sachdev_Example" },
+      { title: "Patent by Kunwer Sachdev - Google Patents Example", url: "https://patents.google.com/patent/US1234567B2/en?assignee=Kunwer+Sachdev&oq=Kunwer+Sachdev" },
+      { title: "Impact of Su-Kam: A Study - Harvard Business Review Example", url: "https://hbr.org/2021/05/impact-of-su-kam-kunwer-sachdev-example" },
+      { title: "Kunwer Sachdev's LinkedIn Profile", url: "https://www.linkedin.com/in/kunwersachdevexample/" },
+      { title: "Old Interview with Kunwer Sachdev - Doordarshan Archives", url: "https://archives.doordarshan.gov.in/interview/kunwer-sachdev-early-days-example" },
       { title: "Kunwer Sachdev - Bing Search", url: "https://www.bing.com/search?q=Kunwer+Sachdev" },
       { title: "Kunwer Sachdev - DuckDuckGo Search", url: "https://duckduckgo.com/?q=Kunwer+Sachdev" },
       { title: "Kunwer Sachdev - Brave Search", url: "https://search.brave.com/search?q=Kunwer+Sachdev" },
@@ -160,7 +175,7 @@ export function EncyclopediaTab() {
           <CardTitle className="text-xl font-headline">Consolidated Unique Source Links</CardTitle>
           <CardDescription>
             This section aggregates all unique URLs from your encyclopedia entries, 
-            including links gathered from the 'Online Search Presence' examples. 
+            including links from the "Online Search Presence" examples where you'd list your findings from Google, Bing, etc.
             Duplicates are automatically removed.
           </CardDescription>
         </CardHeader>
