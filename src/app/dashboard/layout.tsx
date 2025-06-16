@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               href="https://kunwwer.ai/" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+              className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
             >
               Made by Kunwwer.ai
             </a>
