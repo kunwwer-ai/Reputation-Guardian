@@ -108,7 +108,9 @@ export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     content_markdown: "Collect links to Instagram posts, reels, or profiles featuring Kunwer Sachdev.",
     source_verified: false,
     disputed_flag: false,
-    source_links: [],
+    source_links: [
+        { id: "link-insta-1", title: "Kunwer Sachdev at Tech Conference 2024", url: "https://placehold.co/1080x1080.png", excerpt: "A photo from the recent tech conference where Mr. Sachdev was a speaker.", timestamp: new Date(Date.now() - 86400000 * 2), platform: "Instagram Placeholder" }
+    ],
   },
   {
     id: "enc-other-social",
@@ -163,5 +165,20 @@ export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     source_verified: false,
     disputed_flag: false,
     source_links: [],
+  },
+  {
+    id: "enc-sample-photos",
+    profileId: "profile1",
+    section_title: "Sample Photos & Media",
+    content_markdown: "A collection of sample photos and media for demonstration in the Photo Gallery.",
+    source_verified: true,
+    disputed_flag: false,
+    source_links: [
+      { id: "photo-sample-1", title: "Corporate Event Speaker", url: "https://placehold.co/600x400.png", excerpt: "Kunwer Sachdev speaking at a corporate event.", timestamp: new Date(Date.now() - 86400000 * 7), platform: "Event Photography" },
+      { id: "photo-sample-2", title: "Innovation Award Ceremony", url: "https://placehold.co/400x600.png", excerpt: "Receiving an award for innovation.", timestamp: new Date(Date.now() - 86400000 * 14), platform: "Awards Gala" },
+      { id: "photo-sample-3", title: "Team Meeting Brainstorm", url: "https://placehold.co/800x500.png", excerpt: "Leading a team brainstorming session.", timestamp: new Date(Date.now() - 86400000 * 21), platform: "Internal Photos" },
+      { id: "photo-sample-4", title: "Product Launch Presentation", url: "https://placehold.co/700x450.png", excerpt: "Presenting a new product at a launch event.", timestamp: new Date(Date.now() - 86400000 * 28), platform: "Product Launch" },
+      { id: "photo-sample-5", title: "Office Exterior Modern Building", url: "https://placehold.co/500x500.png", excerpt: "Exterior shot of the main office building.", timestamp: new Date(Date.now() - 86400000 * 35), platform: "Company Photos" }
+    ],
   }
 ];
