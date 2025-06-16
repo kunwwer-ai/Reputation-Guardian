@@ -62,7 +62,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col h-full">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-grow flex flex-col">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-7 mb-4 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-7 gap-1 mb-6 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="mentions">Mentions</TabsTrigger>
           <TabsTrigger value="legal-cases">Legal Cases</TabsTrigger>
