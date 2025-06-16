@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 
-const LOCAL_STORAGE_KEY = "encyclopediaEntries_v2"; // Changed key to force reload
+const LOCAL_STORAGE_KEY = "encyclopediaEntries_v3"; // Updated key
 
 // Updated Mock Encyclopedia Entries for Kunwer Sachdev (person)
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -21,7 +21,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     content_markdown: "Kunwer Sachdev is known for his entrepreneurial ventures in the energy sector.\n\nKey Highlights:\n- Founded Su-Kam Power Systems\n- Contributions to inverter technology in India\n- Speaker on innovation and entrepreneurship",
     source_verified: true,
     disputed_flag: false,
-    source_links: [{ title: "Kunwer Sachdev - Official Google Search", url: "https://g.co/kgs/PJj2Uru" }],
+    source_links: [{ title: "Kunwer Sachdev - Official Google Search Profile", url: "https://g.co/kgs/PJj2Uru" }],
   },
   {
     id: "enc2",
@@ -31,45 +31,39 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     source_verified: true,
     disputed_flag: false,
     source_links: [
-      { title: "Award News Archive", url: "https://awards.example/ks-archive" }, 
-      { title: "Innovation Review Forum", url: "https://forum.example/ks-innovations" },
-      { title: "Kunwer Sachdev - Official Google Search", url: "https://g.co/kgs/PJj2Uru" }
+      { title: "Award News Archive Example", url: "https://awards.example/ks-archive" }, 
+      { title: "Innovation Review Forum Example", url: "https://forum.example/ks-innovations" },
+      { title: "Kunwer Sachdev - Official Google Search Profile", url: "https://g.co/kgs/PJj2Uru" }
     ],
   },
   {
     id: "enc3",
     profileId: "profile1",
-    section_title: "Online Search Presence (Examples)",
-    content_markdown: "This section is for collecting example search result links for 'Kunwer Sachdev' and its variations (e.g., Kunwar Sachdeva, Kuwer Sachdeva, Kumar Sachdeva) from various search engines like Google, Bing, etc. In a live system, these might be automatically discovered. Use the 'Add Link' button on this card to manually add more relevant search result URLs you find. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.",
+    section_title: "Google Search Examples for 'Kunwer Sachdev'", // UPDATED TITLE
+    content_markdown: "This section is for collecting example links found on Google when searching for 'Kunwer Sachdev'. In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find for 'Kunwer Sachdev'. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.", // UPDATED DESCRIPTION
     source_verified: false,
     disputed_flag: false,
-    source_links: [
-      { title: "Kunwer Sachdev - Google Search", url: "https://www.google.com/search?q=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Forbes Profile", url: "https://www.forbes.com/profile/kunwer-sachdev-example" },
-      { title: "Interview with Kunwer Sachdev - TechCrunch", url: "https://techcrunch.com/2023/01/15/kunwer-sachdev-interview-example" },
-      { title: "Kunwer Sachdev's Innovations - Wired", url: "https://www.wired.com/story/kunwer-sachdev-innovations-example" },
-      { title: "The Su-Kam Story by Kunwer Sachdev - Economic Times", url: "https://economictimes.indiatimes.com/kunwer-sachdev-sukam-story-example" },
-      { title: "Kunwer Sachdev on Entrepreneurship - YourStory", url: "https://yourstory.com/2022/11/kunwer-sachdev-entrepreneurship-tips-example" },
-      { title: "Kunwer Sachdev: A Visionary Leader - Business Standard", url: "https://www.business-standard.com/article/companies/kunwer-sachdev-visionary-leader-example-12345.html" },
-      { title: "Understanding Inverter Technology with Kunwer Sachdev - IEEE Spectrum", url: "https://spectrum.ieee.org/kunwer-sachdev-inverter-technology-example" },
-      { title: "Kunwer Sachdev's Philanthropic Work - The Better India", url: "https://www.thebetterindia.com/kunwer-sachdev-philanthropy-example/" },
-      { title: "Book Review: 'The Inverter Man' by Kunwer Sachdev - Goodreads", url: "https://www.goodreads.com/book/show/12345678-the-inverter-man-kunwer-sachdev-example" },
-      { title: "Kunwer Sachdev YouTube Channel - Example", url: "https://www.youtube.com/channel/UCexampleKunwerSachdev" },
-      { title: "Kunwer Sachdev - Wikipedia (Draft Example)", url: "https://en.wikipedia.org/wiki/Draft:Kunwer_Sachdev_Example" },
-      { title: "Patent by Kunwer Sachdev - Google Patents Example", url: "https://patents.google.com/patent/US1234567B2/en?assignee=Kunwer+Sachdev&oq=Kunwer+Sachdev" },
-      { title: "Impact of Su-Kam: A Study - Harvard Business Review Example", url: "https://hbr.org/2021/05/impact-of-su-kam-kunwer-sachdev-example" },
-      { title: "Kunwer Sachdev's LinkedIn Profile", url: "https://www.linkedin.com/in/kunwersachdevexample/" },
-      { title: "Old Interview with Kunwer Sachdev - Doordarshan Archives", url: "https://archives.doordarshan.gov.in/interview/kunwer-sachdev-early-days-example" },
-      { title: "Kunwer Sachdev - Bing Search", url: "https://www.bing.com/search?q=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - DuckDuckGo Search", url: "https://duckduckgo.com/?q=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Brave Search", url: "https://search.brave.com/search?q=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Yahoo Search", url: "https://search.yahoo.com/search?p=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Startpage Search", url: "https://www.startpage.com/sp/search?query=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Yandex Search", url: "https://yandex.com/search/?text=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Baidu Search", url: "https://www.baidu.com/s?wd=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Ecosia Search", url: "https://www.ecosia.org/search?q=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - Qwant Search", url: "https://www.qwant.com/?q=Kunwer+Sachdev" },
-      { title: "Kunwer Sachdev - You.com Search", url: "https://you.com/search?q=Kunwer+Sachdev" },
+    source_links: [ // CURATED GOOGLE-LIKE LINKS
+      { title: "Google Search: Kunwer Sachdev", url: "https://www.google.com/search?q=Kunwer+Sachdev" },
+      { title: "Google Search Result: Forbes Profile - Kunwer Sachdev", url: "https://www.forbes.com/profile/kunwer-sachdev-example" },
+      { title: "Google Search Result: TechCrunch Interview - Kunwer Sachdev", url: "https://techcrunch.com/2023/01/15/kunwer-sachdev-interview-example" },
+      { title: "Google Search Result: Wired - Kunwer Sachdev's Innovations", url: "https://www.wired.com/story/kunwer-sachdev-innovations-example" },
+      { title: "Google Search Result: Economic Times - The Su-Kam Story", url: "https://economictimes.indiatimes.com/kunwer-sachdev-sukam-story-example" },
+      { title: "Google Search Result: YourStory - Kunwer Sachdev on Entrepreneurship", url: "https://yourstory.com/2022/11/kunwer-sachdev-entrepreneurship-tips-example" },
+      { title: "Google Search Result: Business Standard - Visionary Leader", url: "https://www.business-standard.com/article/companies/kunwer-sachdev-visionary-leader-example-12345.html" },
+      { title: "Google Search Result: IEEE Spectrum - Inverter Technology", url: "https://spectrum.ieee.org/kunwer-sachdev-inverter-technology-example" },
+      { title: "Google Search Result: The Better India - Philanthropic Work", url: "https://www.thebetterindia.com/kunwer-sachdev-philanthropy-example/" },
+      { title: "Google Search Result: Goodreads - 'The Inverter Man' Book Review", url: "https://www.goodreads.com/book/show/12345678-the-inverter-man-kunwer-sachdev-example" },
+      { title: "Google Search Result: YouTube Channel - Kunwer Sachdev Example", url: "https://www.youtube.com/channel/UCexampleKunwerSachdev" },
+      { title: "Google Search Result: Wikipedia (Draft) - Kunwer Sachdev", url: "https://en.wikipedia.org/wiki/Draft:Kunwer_Sachdev_Example" },
+      { title: "Google Patents: Patent by Kunwer Sachdev", url: "https://patents.google.com/patent/US1234567B2/en?assignee=Kunwer+Sachdev&oq=Kunwer+Sachdev" },
+      { title: "Google Scholar: Impact of Su-Kam Study Example", url: "https://scholar.google.com/scholar?q=impact+of+su-kam+kunwer+sachdev" },
+      { title: "Google Search Result: LinkedIn Profile - Kunwer Sachdev", url: "https://www.linkedin.com/in/kunwersachdevexample/" },
+      { title: "Google News: Kunwer Sachdev on Renewable Energy", url: "https://news.google.com/articles/CBMiQGh0dHBzOi8vbmV3cy5leGFtcGxlLmNvbS9rdW53ZXItc2FjaGRldi1yZW5ld2FibGUtZW5lcmd5P2hsPWVuLUlOJmdsPUlO" },
+      { title: "Google Images: Kunwer Sachdev Photos", url: "https://www.google.com/search?q=Kunwer+Sachdev&tbm=isch" },
+      { title: "Google Books: 'Entrepreneurship Journey' by Kunwer Sachdev", url: "https://books.google.com/books?id=exampleBookId&q=Kunwer+Sachdev" },
+      { title: "Google Shopping: Products by Kunwer Sachdev's Company (Example)", url: "https://www.google.com/search?q=Su-Kam+inverters&tbm=shop" },
+      { title: "Google Maps: Su-Kam Power Systems HQ (Example)", url: "https://www.google.com/maps/search/Su-Kam+Power+Systems+Headquarters" }
     ],
   }
 ];
@@ -174,8 +168,8 @@ export function EncyclopediaTab() {
         <CardHeader>
           <CardTitle className="text-xl font-headline">Consolidated Unique Source Links</CardTitle>
           <CardDescription>
-            This section aggregates all unique URLs from your encyclopedia entries, 
-            including links from the "Online Search Presence" examples where you'd list your findings from Google, Bing, etc.
+            This section aggregates all unique URLs from your encyclopedia entries. 
+            Currently, it will primarily show links from the "Google Search Examples for 'Kunwer Sachdev'" section.
             Duplicates are automatically removed.
           </CardDescription>
         </CardHeader>
@@ -230,4 +224,6 @@ export function EncyclopediaTab() {
     </div>
   );
 }
+    
+
     
