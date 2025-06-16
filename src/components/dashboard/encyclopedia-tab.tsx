@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 
-const LOCAL_STORAGE_KEY = "encyclopediaEntries";
+const LOCAL_STORAGE_KEY = "encyclopediaEntries_v2"; // Changed key to force reload
 
 // Updated Mock Encyclopedia Entries for Kunwer Sachdev (person)
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -33,7 +33,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     source_links: [
       { title: "Award News Archive", url: "https://awards.example/ks-archive" }, 
       { title: "Innovation Review Forum", url: "https://forum.example/ks-innovations" },
-      { title: "Kunwer Sachdev - Official Google Search", url: "https://g.co/kgs/PJj2Uru" } // Example of a repeated link
+      { title: "Kunwer Sachdev - Official Google Search", url: "https://g.co/kgs/PJj2Uru" }
     ],
   },
   {
@@ -120,7 +120,7 @@ export function EncyclopediaTab() {
 
   const handleAddEntry = () => {
     const newEntry: EncyclopediaEntry = {
-      id: `enc${Date.now()}`, // Use timestamp for more unique ID
+      id: `enc${Date.now()}`, 
       profileId: "profile1",
       section_title: "New Custom Section",
       content_markdown: "Enter content here...",
@@ -147,7 +147,7 @@ export function EncyclopediaTab() {
             <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
           </CardContent>
         </Card>
-        {[...Array(2)].map((_, i) => ( // Keep some skeletons for sections
+        {[...Array(2)].map((_, i) => ( 
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
