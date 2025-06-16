@@ -157,7 +157,7 @@ export function OverviewTab() {
               <CardHeader>
                 <CardTitle className="text-base flex items-center">
                   <BarChartHorizontalBig className="mr-2 h-5 w-5 text-primary" />
-                  Content Trends
+                  Trends
                 </CardTitle>
                 <CardDescription className="text-xs">Monthly/Weekly data volume.</CardDescription>
               </CardHeader>
