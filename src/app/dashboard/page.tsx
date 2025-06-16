@@ -8,7 +8,8 @@ import { LegalCasesTab } from "@/components/dashboard/legal-cases-tab";
 import { EncyclopediaTab } from "@/components/dashboard/encyclopedia-tab";
 import { NewsFeedTab } from "@/components/dashboard/news-feed-tab";
 import { ContentGenerationTab } from "@/components/dashboard/content-generation-tab";
-import { SettingsTab } from "@/components/dashboard/settings-tab"; // Import the new SettingsTab
+import { SettingsTab } from "@/components/dashboard/settings-tab";
+import { AnalyticsTab } from "@/components/dashboard/analytics-tab"; // Import the new AnalyticsTab
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { EncyclopediaEntry, EncyclopediaSourceLink } from "@/types";
@@ -20,7 +21,7 @@ function RiskAssessmentToolPlaceholder() {
   return <div className="p-4 border rounded-lg bg-card shadow"><h3 className="text-xl font-semibold">Risk Assessment Tool</h3><p className="text-muted-foreground">AI-powered scanning tool to analyze online mentions and legal cases, and assess their risk level. (Coming Soon)</p></div>;
 }
 
-const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-feed", "risk-assessment", "content-generation", "settings"];
+const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-feed", "risk-assessment", "content-generation", "settings", "analytics"];
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -31,9 +32,35 @@ export default function DashboardPage() {
   useEffect(() => {
     const storedEntries = localStorage.getItem(LOCAL_STORAGE_KEY_ENCYCLOPEDIA);
     if (storedEntries) {
-      setEncyclopediaEntries(JSON.parse(storedEntries));
+      try {
+        const parsedEntries = JSON.parse(storedEntries);
+        // Ensure timestamps are Date objects
+        const entriesWithDates = parsedEntries.map((entry: EncyclopediaEntry) => ({
+          ...entry,
+          source_links: entry.source_links?.map(link => ({
+            ...link,
+            timestamp: link.timestamp ? new Date(link.timestamp) : undefined,
+          })) || [],
+        }));
+        setEncyclopediaEntries(entriesWithDates);
+      } catch (error) {
+        console.error("Error parsing encyclopedia entries from localStorage:", error);
+        setEncyclopediaEntries(initialMockEncyclopediaEntries.map(entry => ({
+          ...entry,
+          source_links: entry.source_links?.map(link => ({
+            ...link,
+            timestamp: link.timestamp ? new Date(link.timestamp) : undefined,
+          })) || [],
+        })));
+      }
     } else {
-      setEncyclopediaEntries(initialMockEncyclopediaEntries);
+       setEncyclopediaEntries(initialMockEncyclopediaEntries.map(entry => ({
+          ...entry,
+          source_links: entry.source_links?.map(link => ({
+            ...link,
+            timestamp: link.timestamp ? new Date(link.timestamp) : undefined,
+          })) || [],
+        })));
     }
     setIsEncyclopediaLoading(false);
   }, []);
@@ -53,8 +80,6 @@ export default function DashboardPage() {
           setActiveTab(currentUrlHash);
         }
       } else {
-        // Default to 'overview' if hash is invalid or not present,
-        // but only if already on /dashboard to avoid redirect loops from /dashboard/settings
         if (activeTab !== "overview" && window.location.pathname === '/dashboard') {
           setActiveTab("overview");
           router.replace('/dashboard#overview', { scroll: false });
@@ -75,7 +100,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Context provider methods
   const addLinkToEntry = (entryId: string, link: EncyclopediaSourceLink) => {
     setEncyclopediaEntries(prevEntries =>
       prevEntries.map(entry =>
@@ -123,14 +147,15 @@ export default function DashboardPage() {
       }}>
       <div className="flex flex-col h-full">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-grow flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-8 gap-1 mb-6 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10 p-1">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-9 xl:grid-cols-9 gap-1 mb-6 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10 p-1">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="mentions">Mentions</TabsTrigger>
             <TabsTrigger value="legal-cases">Legal Cases</TabsTrigger>
             <TabsTrigger value="encyclopedia">Encyclopedia</TabsTrigger>
             <TabsTrigger value="news-feed">News Feed</TabsTrigger>
-            <TabsTrigger value="risk-assessment">Risk Assessment</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="content-generation">Content Generation</TabsTrigger>
+            <TabsTrigger value="risk-assessment">Risk Assessment</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -150,11 +175,14 @@ export default function DashboardPage() {
             <TabsContent value="news-feed" className="mt-0">
               {!isEncyclopediaLoading && <NewsFeedTab />}
             </TabsContent>
-            <TabsContent value="risk-assessment" className="mt-0">
-              <RiskAssessmentToolPlaceholder />
+            <TabsContent value="analytics" className="mt-0">
+              {!isEncyclopediaLoading && <AnalyticsTab />}
             </TabsContent>
             <TabsContent value="content-generation" className="mt-0">
               {!isEncyclopediaLoading && <ContentGenerationTab />}
+            </TabsContent>
+            <TabsContent value="risk-assessment" className="mt-0">
+              <RiskAssessmentToolPlaceholder />
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
               <SettingsTab />

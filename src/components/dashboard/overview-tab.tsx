@@ -5,22 +5,25 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User } from "lucide-react";
+import { ShieldCheck, TrendingUp, TrendingDown, User, BarChartHorizontalBig } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+
 
 const MOCK_PROFILE: Profile = {
   id: "profile1",
   full_name: "Kunwer Sachdev",
   entity_type: "person",
   reputation_score: 82,
-  threat_level: "ORANGE", // Updated from GREEN to ORANGE for testing
+  threat_level: "ORANGE", 
   verified: true,
   last_updated: new Date(Date.now() - 86400000 * 3), 
 };
 
 export function OverviewTab() {
+  const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentAvatarSrc, setCurrentAvatarSrc] = useState<string>("");
@@ -80,24 +83,6 @@ export function OverviewTab() {
       </Card>
     );
   }
-
-  const getThreatBadgeClasses = (level: Profile['threat_level']) => {
-    switch (level) {
-      case 'RED': return 'bg-destructive text-destructive-foreground';
-      case 'ORANGE': return 'bg-orange-500 text-primary-foreground'; // Using Tailwind orange
-      case 'GREEN': return 'bg-green-600 text-primary-foreground'; // Using Tailwind green
-      default: return 'bg-secondary text-secondary-foreground';
-    }
-  };
-
-  const getThreatIcon = (level: Profile['threat_level']) => {
-    switch(level) {
-        case 'RED': return <AlertTriangle className="mr-1 h-4 w-4 text-destructive" />;
-        case 'ORANGE': return <AlertTriangle className="mr-1 h-4 w-4 text-orange-500" />; 
-        case 'GREEN': return <ShieldCheck className="mr-1 h-4 w-4 text-green-600" />;
-        default: return null;
-    }
-  };
   
   const avatarFallbackName = profile.full_name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-10 w-10" />;
 
@@ -134,15 +119,18 @@ export function OverviewTab() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-card/50">
+             <Card className="bg-card/50">
               <CardHeader>
                 <CardTitle className="text-base flex items-center">
-                    {getThreatIcon(profile.threat_level)}
-                    Threat Level
+                    <BarChartHorizontalBig className="mr-2 h-5 w-5 text-primary" />
+                    Content Analytics
                 </CardTitle>
+                <CardDescription>Track online content volume over time.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge className={cn("text-lg px-3 py-1", getThreatBadgeClasses(profile.threat_level))}>{profile.threat_level}</Badge>
+                 <Button onClick={() => router.push('/dashboard#analytics')}>
+                    View Monthly Trends
+                 </Button>
               </CardContent>
             </Card>
             <Card className="bg-card/50">
