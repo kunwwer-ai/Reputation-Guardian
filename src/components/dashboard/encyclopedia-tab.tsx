@@ -4,13 +4,14 @@
 import type { EncyclopediaEntry } from "@/types";
 import { EncyclopediaCard } from "@/components/encyclopedia-card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Link as LinkIcon, ExternalLink } from "lucide-react"; 
-import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { PlusCircle, Link as LinkIcon, ExternalLink, Search as SearchIcon } from "lucide-react"; 
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card"; 
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 
-const LOCAL_STORAGE_KEY = "encyclopediaEntries_v4"; // Updated key
+const LOCAL_STORAGE_KEY = "encyclopediaEntries_v4";
 
 // Updated Mock Encyclopedia Entries for Kunwer Sachdev (person)
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -40,7 +41,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     id: "enc3",
     profileId: "profile1",
     section_title: "Google Search Examples for 'Kunwer Sachdev'",
-    content_markdown: "This section is for collecting example links found on Google when searching for 'Kunwer Sachdev'. In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find for 'Kunwer Sachdev'. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.",
+    content_markdown: "This section is specifically for collecting example links found on Google when searching for 'Kunwer Sachdev'. In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find for 'Kunwer Sachdev'. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.",
     source_verified: false,
     disputed_flag: false,
     source_links: [ 
@@ -69,7 +70,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     id: "enc-google-news",
     profileId: "profile1",
     section_title: "Google News Mentions for 'Kunwer Sachdev'",
-    content_markdown: "Example news articles related to 'Kunwer Sachdev', typically found via Google News. In a live system, these might be periodically fetched using Google's official APIs (e.g., Custom Search JSON API configured for news).",
+    content_markdown: "Example news articles related to 'Kunwer Sachdev', typically found via Google News. In a live system, these might be periodically fetched using Google's official APIs (e.g., Custom Search JSON API configured for news). Use the 'Add Link' button on this card to add more news links.",
     source_verified: false,
     disputed_flag: false,
     source_links: [
@@ -91,6 +92,7 @@ export function EncyclopediaTab() {
   const [entries, setEntries] = useState<EncyclopediaEntry[]>([]);
   const [allUniqueLinks, setAllUniqueLinks] = useState<{ title: string; url: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -147,6 +149,16 @@ export function EncyclopediaTab() {
     toast({ title: "New Section Added", description: "A new encyclopedia section has been created." });
   };
 
+  const filteredEntries = useMemo(() => {
+    if (!searchQuery) {
+      return entries;
+    }
+    return entries.filter(entry =>
+      entry.section_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      entry.content_markdown.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [entries, searchQuery]);
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -160,7 +172,10 @@ export function EncyclopediaTab() {
             <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
           </CardContent>
         </Card>
-        {[...Array(3)].map((_, i) => ( // Show 3 skeletons now with the new section
+        <div className="relative mb-4">
+          <div className="h-10 bg-muted rounded w-full animate-pulse"></div>
+        </div>
+        {[...Array(3)].map((_, i) => ( 
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
@@ -187,9 +202,7 @@ export function EncyclopediaTab() {
         <CardHeader>
           <CardTitle className="text-xl font-headline">Consolidated Unique Source Links</CardTitle>
           <CardDescription>
-            This section aggregates all unique URLs from your encyclopedia entries. 
-            Currently, it will primarily show links from the "Google Search Examples" and "Google News Mentions" sections.
-            Duplicates are automatically removed.
+            This section aggregates all unique URLs from your encyclopedia entries (e.g., Google Search, Google News, etc.). Duplicates are automatically removed.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -226,16 +239,31 @@ export function EncyclopediaTab() {
           <PlusCircle className="mr-2 h-4 w-4" /> Add Section
         </Button>
       </div>
+
+      <div className="relative mb-4">
+        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search encyclopedia sections..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 shadow-sm"
+        />
+      </div>
       
-      {entries.length === 0 && !isLoading ? (
+      {filteredEntries.length === 0 && !isLoading ? (
          <Card className="shadow-lg">
           <CardContent className="pt-6">
-            <p>No encyclopedia entries have been created yet. Click "Add Section" to get started.</p>
+            {searchQuery ? (
+                <p>No encyclopedia sections match your search for "{searchQuery}".</p>
+            ) : (
+                <p>No encyclopedia entries have been created yet. Click "Add Section" to get started.</p>
+            )}
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-          {entries.map(entry => (
+          {filteredEntries.map(entry => (
             <EncyclopediaCard key={entry.id} entry={entry} onUpdateEntry={handleUpdateEntry} />
           ))}
         </div>
@@ -243,6 +271,4 @@ export function EncyclopediaTab() {
     </div>
   );
 }
-    
-
     

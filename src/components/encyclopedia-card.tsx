@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle } from "lucide-react";
-import { useState, useEffect } from "react"; // Added useEffect
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface EncyclopediaCardProps {
@@ -145,37 +145,35 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
           <Label htmlFor={`disputed-${currentEntry.id}`} className="text-sm">Disputed Flag</Label>
         </div>
 
-        {(currentEntry.id === "enc3" || currentEntry.id === "enc-google-news") && (
-          <Dialog open={isAddLinkDialogOpen} onOpenChange={setIsAddLinkDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Link
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Link to "{currentEntry.section_title}"</DialogTitle>
-                <DialogDescription>
-                  Enter the title and URL for the link you want to add to this section.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="space-y-1">
-                  <Label htmlFor="link-title">Link Title</Label>
-                  <Input id="link-title" value={newLinkTitle} onChange={(e) => setNewLinkTitle(e.target.value)} placeholder="e.g., Google Search Result for..." />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="link-url">Link URL</Label>
-                  <Input id="link-url" value={newLinkUrl} onChange={(e) => setNewLinkUrl(e.target.value)} placeholder="https://www.example.com/search-result" />
-                </div>
+        <Dialog open={isAddLinkDialogOpen} onOpenChange={setIsAddLinkDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Link
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Link to "{currentEntry.section_title}"</DialogTitle>
+              <DialogDescription>
+                Enter the title and URL for the link you want to add to this section.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-1">
+                <Label htmlFor="link-title">Link Title</Label>
+                <Input id="link-title" value={newLinkTitle} onChange={(e) => setNewLinkTitle(e.target.value)} placeholder="e.g., Google Search Result for..." />
               </div>
-              <DialogFooter>
-                <DialogClose asChild><Button variant="outline" onClick={() => { setNewLinkTitle(""); setNewLinkUrl("");}}>Cancel</Button></DialogClose>
-                <Button onClick={handleAddLink}>Save Link</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+              <div className="space-y-1">
+                <Label htmlFor="link-url">Link URL</Label>
+                <Input id="link-url" value={newLinkUrl} onChange={(e) => setNewLinkUrl(e.target.value)} placeholder="https://www.example.com/search-result" />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild><Button variant="outline" onClick={() => { setNewLinkTitle(""); setNewLinkUrl("");}}>Cancel</Button></DialogClose>
+              <Button onClick={handleAddLink}>Save Link</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={isEditSectionDialogOpen} onOpenChange={setIsEditSectionDialogOpen}>
             <DialogTrigger asChild>
