@@ -4,10 +4,11 @@
 import type { EncyclopediaEntry } from "@/types";
 import { EncyclopediaCard } from "@/components/encyclopedia-card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Link as LinkIcon, ExternalLink } from "lucide-react"; // Added LinkIcon, ExternalLink
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card"; // Added CardDescription
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area"; // Added ScrollArea
 
 const LOCAL_STORAGE_KEY = "encyclopediaEntries";
 
@@ -29,7 +30,11 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     content_markdown: "Throughout his career, Kunwer Sachdev has received several accolades for his work.\n\n- Ernst & Young Entrepreneur of the Year (Manufacturing) \n- India Today's 'Icons of Tomorrow'\n\nSome public discussions have questioned the early-stage market impact of certain innovations, though largely reviews are positive.",
     source_verified: true,
     disputed_flag: false,
-    source_links: [{ title: "Award News Archive", url: "https://awards.example/ks-archive" }, { title: "Innovation Review Forum", url: "https://forum.example/ks-innovations" }],
+    source_links: [
+      { title: "Award News Archive", url: "https://awards.example/ks-archive" }, 
+      { title: "Innovation Review Forum", url: "https://forum.example/ks-innovations" },
+      { title: "Kunwer Sachdev - Official Google Search", url: "https://g.co/kgs/PJj2Uru" } // Example of a repeated link
+    ],
   },
   {
     id: "enc3",
@@ -56,6 +61,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
 
 export function EncyclopediaTab() {
   const [entries, setEntries] = useState<EncyclopediaEntry[]>([]);
+  const [allUniqueLinks, setAllUniqueLinks] = useState<{ title: string; url: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -69,19 +75,37 @@ export function EncyclopediaTab() {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (entries.length > 0) {
+      const collectedLinks: { title: string; url: string }[] = [];
+      entries.forEach(entry => {
+        if (entry.source_links) {
+          collectedLinks.push(...entry.source_links);
+        }
+      });
+
+      const uniqueLinksMap = new Map<string, { title: string; url: string }>();
+      collectedLinks.forEach(link => {
+        if (link.url && !uniqueLinksMap.has(link.url)) { 
+          uniqueLinksMap.set(link.url, link);
+        }
+      });
+      setAllUniqueLinks(Array.from(uniqueLinksMap.values()).sort((a, b) => (a.title || "").localeCompare(b.title || "")));
+    } else {
+      setAllUniqueLinks([]);
+    }
+  }, [entries]);
+
 
   const handleUpdateEntry = (updatedEntry: EncyclopediaEntry) => {
     const newEntries = entries.map(e => e.id === updatedEntry.id ? updatedEntry : e);
     setEntries(newEntries);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newEntries));
-    // Toast is handled in EncyclopediaCard for more specific messages
   };
 
   const handleAddEntry = () => {
-    // This functionality is not fully implemented for adding entirely new sections yet.
-    // For now, it's a placeholder.
     const newEntry: EncyclopediaEntry = {
-      id: `enc${entries.length + 1}`,
+      id: `enc${Date.now()}`, // Use timestamp for more unique ID
       profileId: "profile1",
       section_title: "New Custom Section",
       content_markdown: "Enter content here...",
@@ -98,7 +122,17 @@ export function EncyclopediaTab() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {[...Array(3)].map((_, i) => (
+        <Card className="shadow-lg mb-6">
+          <CardHeader>
+            <div className="h-7 bg-muted rounded w-1/2 animate-pulse"></div>
+            <div className="h-4 bg-muted rounded w-3/4 mt-1 animate-pulse"></div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-4 bg-muted rounded w-full animate-pulse mb-2"></div>
+            <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
+          </CardContent>
+        </Card>
+        {[...Array(2)].map((_, i) => ( // Keep some skeletons for sections
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
@@ -121,7 +155,40 @@ export function EncyclopediaTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-xl font-headline">All Unique Source Links</CardTitle>
+          <CardDescription>A collection of all unique links from your encyclopedia sections.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {allUniqueLinks.length > 0 ? (
+            <ScrollArea className="h-72 border rounded-md p-3">
+              <ul className="space-y-2">
+                {allUniqueLinks.map((link, index) => (
+                  <li key={index} className="text-sm">
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline inline-flex items-center gap-1.5 group"
+                    >
+                      <LinkIcon className="h-4 w-4 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <span className="truncate flex-grow" title={link.title || link.url}>
+                        {link.title || new URL(link.url).hostname}
+                      </span>
+                      <ExternalLink className="h-3 w-3 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+          ) : (
+            <p className="text-muted-foreground">No unique source links found across all sections.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-between items-center pt-4">
         <h2 className="text-2xl font-semibold font-headline tracking-tight">Encyclopedia Sections</h2>
         <Button onClick={handleAddEntry} aria-label="Add new encyclopedia section">
           <PlusCircle className="mr-2 h-4 w-4" /> Add Section
@@ -129,7 +196,11 @@ export function EncyclopediaTab() {
       </div>
       
       {entries.length === 0 && !isLoading ? (
-        <p>No encyclopedia entries found for this profile.</p>
+         <Card className="shadow-lg">
+          <CardContent className="pt-6">
+            <p>No encyclopedia entries have been created yet. Click "Add Section" to get started.</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           {entries.map(entry => (
@@ -140,5 +211,4 @@ export function EncyclopediaTab() {
     </div>
   );
 }
-
     
