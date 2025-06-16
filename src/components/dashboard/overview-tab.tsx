@@ -5,7 +5,7 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, User, TrendingUp, TrendingDown, AlertTriangle, BarChartHorizontalBig } from "lucide-react";
+import { ShieldCheck, User, TrendingUp, TrendingDown, AlertTriangle, BarChartHorizontalBig, CalendarDays } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -73,6 +73,11 @@ export function OverviewTab() {
       case 'GREEN': return <ShieldCheck className="mr-1 h-4 w-4" />;
       default: return <ShieldCheck className="mr-1 h-4 w-4" />; 
     }
+  };
+
+  const handleViewAnalytics = (period: "monthly" | "weekly") => {
+    localStorage.setItem("settings_analyticsDefaultTimePeriod", period);
+    router.push('/dashboard#analytics');
   };
 
 
@@ -159,11 +164,14 @@ export function OverviewTab() {
                   <BarChartHorizontalBig className="mr-2 h-5 w-5 text-primary" />
                   Trends
                 </CardTitle>
-                <CardDescription className="text-xs">Monthly/Weekly data volume.</CardDescription>
+                <CardDescription className="text-xs">Data volume over time.</CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow flex items-center justify-center">
-                <Button onClick={() => router.push('/dashboard#analytics')} variant="default" size="sm">
-                  View Analytics
+              <CardContent className="flex-grow flex flex-col items-center justify-center space-y-2 pt-2">
+                <Button onClick={() => handleViewAnalytics("monthly")} variant="default" size="sm" className="w-full">
+                  <CalendarDays className="mr-2 h-4 w-4" /> Monthly View
+                </Button>
+                <Button onClick={() => handleViewAnalytics("weekly")} variant="outline" size="sm" className="w-full">
+                  <CalendarDays className="mr-2 h-4 w-4" /> Weekly View
                 </Button>
               </CardContent>
             </Card>
