@@ -1,7 +1,7 @@
 
 import type { EncyclopediaEntry } from "@/types";
 
-export const LOCAL_STORAGE_KEY_ENCYCLOPEDIA = "encyclopediaEntries_v9_social";
+export const LOCAL_STORAGE_KEY_ENCYCLOPEDIA = "encyclopediaEntries_v10_locations";
 
 // Updated Mock Encyclopedia Entries - Category-based structure
 export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -115,6 +115,15 @@ export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     profileId: "profile1",
     section_title: "Other Social Media Platforms - Kunwer Sachdev",
     content_markdown: "Collect links from other social media platforms (e.g., Reddit, Quora, TikTok) that mention Kunwer Sachdev.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [],
+  },
+  {
+    id: "enc-google-locations",
+    profileId: "profile1",
+    section_title: "Google Maps / Location Reviews - Kunwer Sachdev",
+    content_markdown: "Collect links to Google Maps locations, business profiles, or points of interest where comments or reviews related to Kunwer Sachdev can be found. These are often linked to Google My Business or user-generated place reviews.",
     source_verified: false,
     disputed_flag: false,
     source_links: [],
