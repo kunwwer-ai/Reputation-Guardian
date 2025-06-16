@@ -11,37 +11,15 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 
-const LOCAL_STORAGE_KEY = "encyclopediaEntries_v4";
+const LOCAL_STORAGE_KEY = "encyclopediaEntries_v5"; // Updated Key
 
-// Updated Mock Encyclopedia Entries for Kunwer Sachdev (person)
+// Updated Mock Encyclopedia Entries - Focused on Search Link Collection
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
   {
-    id: "enc1",
-    profileId: "profile1",
-    section_title: "Biography Overview",
-    content_markdown: "Kunwer Sachdev is known for his entrepreneurial ventures in the energy sector.\n\nKey Highlights:\n- Founded Su-Kam Power Systems\n- Contributions to inverter technology in India\n- Speaker on innovation and entrepreneurship",
-    source_verified: true,
-    disputed_flag: false,
-    source_links: [{ title: "Kunwer Sachdev - Official Google Search Profile", url: "https://g.co/kgs/PJj2Uru" }],
-  },
-  {
-    id: "enc2",
-    profileId: "profile1",
-    section_title: "Major Achievements & Recognitions",
-    content_markdown: "Throughout his career, Kunwer Sachdev has received several accolades for his work.\n\n- Ernst & Young Entrepreneur of the Year (Manufacturing) \n- India Today's 'Icons of Tomorrow'\n\nSome public discussions have questioned the early-stage market impact of certain innovations, though largely reviews are positive.",
-    source_verified: true,
-    disputed_flag: false,
-    source_links: [
-      { title: "Award News Archive Example", url: "https://awards.example/ks-archive" }, 
-      { title: "Innovation Review Forum Example", url: "https://forum.example/ks-innovations" },
-      { title: "Kunwer Sachdev - Official Google Search Profile", url: "https://g.co/kgs/PJj2Uru" }
-    ],
-  },
-  {
-    id: "enc3",
+    id: "enc3", // Google Search Examples
     profileId: "profile1",
     section_title: "Google Search Examples for 'Kunwer Sachdev'",
-    content_markdown: "This section is specifically for collecting example links found on Google when searching for 'Kunwer Sachdev'. In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find for 'Kunwer Sachdev'. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.",
+    content_markdown: "This section is specifically for collecting example links found on Google when searching for 'Kunwer Sachdev' and its common variations (e.g., Kunwar Sachdeva, Kuwer Sachdeva, Kumar Sachdeva). In a live system, these might be automatically discovered or regularly updated. Use the 'Add Link' button on this card to manually add more relevant Google search result URLs you find.",
     source_verified: false,
     disputed_flag: false,
     source_links: [ 
@@ -67,10 +45,10 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     ],
   },
   {
-    id: "enc-google-news",
+    id: "enc-google-news", // Google News Mentions
     profileId: "profile1",
     section_title: "Google News Mentions for 'Kunwer Sachdev'",
-    content_markdown: "Example news articles related to 'Kunwer Sachdev', typically found via Google News. In a live system, these might be periodically fetched using Google's official APIs (e.g., Custom Search JSON API configured for news). Use the 'Add Link' button on this card to add more news links.",
+    content_markdown: "Example news articles related to 'Kunwer Sachdev', typically found via Google News. In a live system, these might be periodically fetched using Google's official APIs. Use the 'Add Link' button on this card to add more news links.",
     source_verified: false,
     disputed_flag: false,
     source_links: [
@@ -137,8 +115,8 @@ export function EncyclopediaTab() {
     const newEntry: EncyclopediaEntry = {
       id: `enc${Date.now()}`, 
       profileId: "profile1",
-      section_title: "New Custom Section",
-      content_markdown: "Enter content here...",
+      section_title: "New Custom Section (e.g., Bing Search)",
+      content_markdown: "Enter content here, or use this section to collect links from a specific source...",
       source_verified: false,
       disputed_flag: false,
       source_links: [],
@@ -175,7 +153,7 @@ export function EncyclopediaTab() {
         <div className="relative mb-4">
           <div className="h-10 bg-muted rounded w-full animate-pulse"></div>
         </div>
-        {[...Array(3)].map((_, i) => ( 
+        {[...Array(2)].map((_, i) => ( 
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
               <div className="h-6 bg-muted rounded w-2/3 animate-pulse"></div>
@@ -234,9 +212,9 @@ export function EncyclopediaTab() {
       </Card>
 
       <div className="flex justify-between items-center pt-4">
-        <h2 className="text-2xl font-semibold font-headline tracking-tight">Encyclopedia Sections</h2>
+        <h2 className="text-2xl font-semibold font-headline tracking-tight">Search Link Collections</h2>
         <Button onClick={handleAddEntry} aria-label="Add new encyclopedia section">
-          <PlusCircle className="mr-2 h-4 w-4" /> Add Section
+          <PlusCircle className="mr-2 h-4 w-4" /> Add Collection (e.g., for Bing)
         </Button>
       </div>
 
@@ -244,7 +222,7 @@ export function EncyclopediaTab() {
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search encyclopedia sections..."
+          placeholder="Search link collections..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-10 shadow-sm"
@@ -255,9 +233,9 @@ export function EncyclopediaTab() {
          <Card className="shadow-lg">
           <CardContent className="pt-6">
             {searchQuery ? (
-                <p>No encyclopedia sections match your search for "{searchQuery}".</p>
+                <p>No link collections match your search for "{searchQuery}".</p>
             ) : (
-                <p>No encyclopedia entries have been created yet. Click "Add Section" to get started.</p>
+                <p>No link collections have been created yet. Click "Add Collection" to get started.</p>
             )}
           </CardContent>
         </Card>
@@ -271,4 +249,6 @@ export function EncyclopediaTab() {
     </div>
   );
 }
+    
+
     
