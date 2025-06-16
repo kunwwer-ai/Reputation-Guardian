@@ -40,7 +40,7 @@ const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     id: "enc3",
     profileId: "profile1",
     section_title: "Online Search Presence (Examples)",
-    content_markdown: "This section is for collecting example search result links for 'Kunwer Sachdev' and its variations (e.g., Kunwar Sachdeva, Kuwer Sachdeva) from various search engines like Google, Bing, etc. In a live system, these might be automatically discovered. Use the 'Add Link' button on this card to manually add more relevant search result URLs you find. All unique links from this and other sections are aggregated in the 'All Unique Source Links' card above.",
+    content_markdown: "This section is for collecting example search result links for 'Kunwer Sachdev' and its variations (e.g., Kunwar Sachdeva, Kuwer Sachdeva, Kumar Sachdeva) from various search engines like Google, Bing, etc. In a live system, these might be automatically discovered. Use the 'Add Link' button on this card to manually add more relevant search result URLs you find. All unique links from this and other sections are aggregated in the 'Consolidated Unique Source Links' card above.",
     source_verified: false,
     disputed_flag: false,
     source_links: [
@@ -157,8 +157,12 @@ export function EncyclopediaTab() {
     <div className="space-y-6">
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="text-xl font-headline">All Unique Source Links</CardTitle>
-          <CardDescription>A collection of all unique links from your encyclopedia sections.</CardDescription>
+          <CardTitle className="text-xl font-headline">Consolidated Unique Source Links</CardTitle>
+          <CardDescription>
+            This section aggregates all unique URLs from your encyclopedia entries, 
+            including links gathered from the 'Online Search Presence' examples. 
+            Duplicates are automatically removed.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {allUniqueLinks.length > 0 ? (
