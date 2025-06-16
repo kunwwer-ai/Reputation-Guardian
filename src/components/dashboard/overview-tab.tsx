@@ -5,7 +5,7 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, User, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
+import { ShieldCheck, User, TrendingUp, TrendingDown, AlertTriangle, BarChartHorizontalBig } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -19,7 +19,7 @@ const MOCK_PROFILE: Profile = {
   reputation_score: 82,
   threat_level: "ORANGE", 
   verified: true,
-  // last_updated and entity_type removed from display
+  last_updated: new Date(),
 };
 
 export function OverviewTab() {
@@ -144,7 +144,7 @@ export function OverviewTab() {
             <Progress value={profile.reputation_score} aria-label={`Reputation score: ${profile.reputation_score} out of 100`} className="h-3 [&>div]:bg-gradient-to-r [&>div]:from-accent [&>div]:to-primary" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="bg-card/50">
               <CardHeader><CardTitle className="text-base flex items-center"><TrendingUp className="mr-2 h-5 w-5 text-green-500" />Positive Mentions</CardTitle></CardHeader>
               <CardContent><p className="text-3xl font-bold">25</p></CardContent>
@@ -152,6 +152,20 @@ export function OverviewTab() {
             <Card className="bg-card/50">
               <CardHeader><CardTitle className="text-base flex items-center"><TrendingDown className="mr-2 h-5 w-5 text-red-500" />Negative Mentions</CardTitle></CardHeader>
               <CardContent><p className="text-3xl font-bold">2</p></CardContent>
+            </Card>
+             <Card className="bg-card/50 flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center">
+                  <BarChartHorizontalBig className="mr-2 h-5 w-5 text-primary" />
+                  Content Trends
+                </CardTitle>
+                <CardDescription className="text-xs">Monthly/Weekly data volume.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow flex items-center justify-center">
+                <Button onClick={() => router.push('/dashboard#analytics')} variant="default" size="sm">
+                  View Analytics
+                </Button>
+              </CardContent>
             </Card>
           </div>
           
@@ -169,3 +183,4 @@ export function OverviewTab() {
     </div>
   );
 }
+

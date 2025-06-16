@@ -39,7 +39,8 @@ export function AnalyticsTab() {
     loadDefaultTimePeriod();
 
     const handleSettingsUpdate = () => loadDefaultTimePeriod();
-    window.addEventListener('analyticsSettingsUpdated', handleSettingsUpdate);
+    // Use a unique event name for analytics settings to avoid conflicts if other settings events exist
+    window.addEventListener('analyticsSettingsUpdated', handleSettingsUpdate); 
     return () => window.removeEventListener('analyticsSettingsUpdated', handleSettingsUpdate);
   }, []);
 
@@ -89,7 +90,6 @@ export function AnalyticsTab() {
       for (let i = 11; i >= 0; i--) { // Last 12 weeks
         const weekStartDate = startOfWeek(subWeeks(today, i), { weekStartsOn: 1 });
         const weekKey = format(weekStartDate, 'yyyy-MM-dd');
-        // const weekName = `W${format(weekStartDate, 'w')} '${format(weekStartDate, 'yy')}`;
         const weekName = format(weekStartDate, "MMM d"); // e.g. Jul 28
         dataPoints.push({
           name: weekName,

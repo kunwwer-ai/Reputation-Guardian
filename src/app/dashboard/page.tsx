@@ -9,7 +9,7 @@ import { EncyclopediaTab } from "@/components/dashboard/encyclopedia-tab";
 import { NewsFeedTab } from "@/components/dashboard/news-feed-tab";
 import { ContentGenerationTab } from "@/components/dashboard/content-generation-tab";
 import { SettingsTab } from "@/components/dashboard/settings-tab";
-// AnalyticsTab import removed
+import { AnalyticsTab } from "@/components/dashboard/analytics-tab";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { EncyclopediaEntry, EncyclopediaSourceLink } from "@/types";
@@ -21,7 +21,7 @@ function RiskAssessmentToolPlaceholder() {
   return <div className="p-4 border rounded-lg bg-card shadow"><h3 className="text-xl font-semibold">Risk Assessment Tool</h3><p className="text-muted-foreground">AI-powered scanning tool to analyze online mentions and legal cases, and assess their risk level. (Coming Soon)</p></div>;
 }
 
-const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-feed", "risk-assessment", "content-generation", "settings"];
+const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-feed", "analytics", "content-generation", "risk-assessment", "settings"];
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -147,13 +147,13 @@ export default function DashboardPage() {
       }}>
       <div className="flex flex-col h-full">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-grow flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-8 gap-1 mb-6 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10 p-1">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 xl:grid-cols-9 gap-1 mb-6 shadow-sm sticky top-0 bg-background/90 backdrop-blur-sm z-10 p-1">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="mentions">Mentions</TabsTrigger>
             <TabsTrigger value="legal-cases">Legal Cases</TabsTrigger>
             <TabsTrigger value="encyclopedia">Encyclopedia</TabsTrigger>
             <TabsTrigger value="news-feed">News Feed</TabsTrigger>
-            {/* Analytics Trigger Removed */}
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="content-generation">Content Generation</TabsTrigger>
             <TabsTrigger value="risk-assessment">Risk Assessment</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -175,7 +175,9 @@ export default function DashboardPage() {
             <TabsContent value="news-feed" className="mt-0">
               {!isEncyclopediaLoading && <NewsFeedTab />}
             </TabsContent>
-            {/* Analytics Content Removed */}
+            <TabsContent value="analytics" className="mt-0">
+              {!isEncyclopediaLoading && <AnalyticsTab />}
+            </TabsContent>
             <TabsContent value="content-generation" className="mt-0">
               {!isEncyclopediaLoading && <ContentGenerationTab />}
             </TabsContent>
@@ -191,3 +193,4 @@ export default function DashboardPage() {
     </EncyclopediaContext.Provider>
   );
 }
+

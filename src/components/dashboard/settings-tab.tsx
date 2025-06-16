@@ -9,12 +9,12 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Edit3, Save, XCircle } from "lucide-react";
-// RadioGroup and BarChart2 imports removed
+import { User, Edit3, Save, XCircle, BarChart2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
-// AnalyticsTimePeriod type removed
+type AnalyticsTimePeriod = "monthly" | "weekly";
 
 export function SettingsTab() {
   const { toast } = useToast();
@@ -39,8 +39,8 @@ export function SettingsTab() {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
-  // Analytics Settings State removed
-  // const [analyticsDefaultTimePeriod, setAnalyticsDefaultTimePeriod] = useState<AnalyticsTimePeriod>("monthly");
+  // Analytics Settings State
+  const [analyticsDefaultTimePeriod, setAnalyticsDefaultTimePeriod] = useState<AnalyticsTimePeriod>("monthly");
 
 
   // Load settings from localStorage on component mount
@@ -72,8 +72,10 @@ export function SettingsTab() {
 
     const storedWhatsAppNotifications = localStorage.getItem("settings_whatsAppNotifications");
     if (storedWhatsAppNotifications) setWhatsAppNotifications(JSON.parse(storedWhatsAppNotifications));
+    
+    const storedAnalyticsPeriod = localStorage.getItem("settings_analyticsDefaultTimePeriod") as AnalyticsTimePeriod | null;
+    if (storedAnalyticsPeriod) setAnalyticsDefaultTimePeriod(storedAnalyticsPeriod);
 
-    // Analytics time period loading removed
   }, []);
 
   const handleSaveProfile = () => {
@@ -122,9 +124,9 @@ export function SettingsTab() {
     localStorage.setItem("settings_pushNotifications", JSON.stringify(pushNotifications));
     localStorage.setItem("settings_whatsAppNumber", whatsAppNumber);
     localStorage.setItem("settings_whatsAppNotifications", JSON.stringify(whatsAppNotifications));
-    // Analytics default time period saving removed
-    toast({ title: "Preferences Saved", description: "Your notification preferences have been updated." });
-    // Analytics settings event dispatch removed
+    localStorage.setItem("settings_analyticsDefaultTimePeriod", analyticsDefaultTimePeriod);
+    toast({ title: "Preferences Saved", description: "Your notification and analytics preferences have been updated." });
+    window.dispatchEvent(new CustomEvent('analyticsSettingsUpdated')); // Notify analytics tab
   };
 
   const handleChangePassword = () => {
@@ -205,7 +207,7 @@ export function SettingsTab() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Preferences</CardTitle>
-          <CardDescription>Configure notifications.</CardDescription>
+          <CardDescription>Configure notifications and default views.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
@@ -244,7 +246,28 @@ export function SettingsTab() {
               </div>
             </div>
           </div>
-          {/* Analytics Preferences Section Removed */}
+          <Separator />
+          <div>
+            <h3 className="text-md font-medium mb-3 flex items-center"><BarChart2 className="mr-2 h-5 w-5 text-primary" /> Analytics Preferences</h3>
+            <div className="space-y-2">
+              <Label>Default Analytics Time Period</Label>
+              <RadioGroup 
+                value={analyticsDefaultTimePeriod} 
+                onValueChange={(value) => setAnalyticsDefaultTimePeriod(value as AnalyticsTimePeriod)}
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="monthly" id="analytics-monthly" />
+                  <Label htmlFor="analytics-monthly">Monthly</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="weekly" id="analytics-weekly" />
+                  <Label htmlFor="analytics-weekly">Weekly</Label>
+                </div>
+              </RadioGroup>
+              <p className="text-xs text-muted-foreground">Set the default view for the Content Trends chart in the Analytics tab.</p>
+            </div>
+          </div>
            <Button onClick={handleSavePreferences}><Save className="mr-2 h-4 w-4" /> Save Preferences</Button>
         </CardContent>
       </Card>
