@@ -11,16 +11,14 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
-// initialMockEncyclopediaEntries and LOCAL_STORAGE_KEY_ENCYCLOPEDIA are now managed in DashboardPage and a separate data file
+import { useSearchParams, useRouter } from "next/navigation"; // Added useRouter
 
 interface EncyclopediaTabProps {
   entries: EncyclopediaEntry[];
   setEntries: React.Dispatch<React.SetStateAction<EncyclopediaEntry[]>>;
-  // isLoading prop might be useful if DashboardPage handles global loading state
 }
 
 export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntries }: EncyclopediaTabProps) {
-  // Use the context for updates, but props for initial render if dashboard is master
   const { 
     entries: contextEntries, 
     setEntries: contextSetEntries,
@@ -28,19 +26,30 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
     updateEncyclopediaEntry: contextUpdateEntry
   } = useEncyclopediaContext();
 
-  // Decide which entries to use: props if available, otherwise context. This handles initial load from DashboardPage.
   const entries = propEntries.length > 0 ? propEntries : contextEntries;
   const setEntries = propSetEntries || contextSetEntries;
-
 
   const [allUniqueLinks, setAllUniqueLinks] = useState<{ title: string; url: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true); // Local loading for initial UI elements if needed
+  const [isLoading, setIsLoading] = useState(true);
+
+  const searchParams = useSearchParams();
+  const router = useRouter(); // Added useRouter
 
   useEffect(() => {
-    // Data loading from localStorage is now handled in DashboardPage.
-    // This effect now primarily recalculates unique links when entries change.
+    const queryFromUrl = searchParams.get('q');
+    const currentHash = window.location.hash;
+
+    if (queryFromUrl && currentHash === '#encyclopedia') {
+      setSearchQuery(queryFromUrl);
+      // Optional: remove the query param from URL after applying it
+      // router.replace('/dashboard#encyclopedia', { scroll: false }); // Be cautious with this, might loop if not handled carefully with activeTab checks
+    }
+  }, [searchParams, router]); // Removed setSearchQuery if it's stable, added router
+
+
+  useEffect(() => {
     if (entries.length > 0) {
       const collectedLinks: { title: string; url: string }[] = [];
       entries.forEach(entry => {
@@ -59,12 +68,11 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
     } else {
       setAllUniqueLinks([]);
     }
-    setIsLoading(false); // Set local loading to false once entries are processed
+    setIsLoading(false); 
   }, [entries]);
 
 
   const handleUpdateEntry = (updatedEntry: EncyclopediaEntry) => {
-    // Use the context's update function which updates DashboardPage's state
     contextUpdateEntry(updatedEntry);
   };
 
@@ -78,7 +86,7 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
       disputed_flag: false,
       source_links: [],
     };
-    contextAddEntry(newEntry); // Use context's add function
+    contextAddEntry(newEntry); 
     toast({ title: "New Collection Added", description: "A new link collection has been created." });
   };
 
@@ -99,8 +107,7 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
     );
   }, [entries, searchQuery]);
   
-  // Skeleton logic might need adjustment if global loading state is preferred from DashboardPage
-  if (isLoading && entries.length === 0) { // Show skeleton only if truly no data yet
+  if (isLoading && entries.length === 0) { 
     return (
       <div className="space-y-6">
         <Card className="shadow-lg mb-6">
@@ -182,16 +189,17 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-10 shadow-sm"
+          aria-label="Search Encyclopedia Collections"
         />
       </div>
       
-      {filteredEntries.length === 0 && entries.length > 0 ? ( // Show if search yields no results but there are entries
+      {filteredEntries.length === 0 && entries.length > 0 ? ( 
          <Card className="shadow-lg">
           <CardContent className="pt-6">
              <p>No link collections match your search for "{searchQuery}". Try a different keyword.</p>
           </CardContent>
         </Card>
-      ) : filteredEntries.length === 0 && entries.length === 0 ? ( // Show if no entries at all
+      ) : filteredEntries.length === 0 && entries.length === 0 ? ( 
          <Card className="shadow-lg">
           <CardContent className="pt-6">
              <p>No link collections have been created yet. Click "Add Collection" to get started.</p>
