@@ -42,20 +42,18 @@ export function UserNav() {
 
     loadUserData(); // Initial load
 
-    // Listen for updates from settings page (name/email) and overview tab (avatar)
-    // Using a single 'userProfileUpdated' event for simplicity now
     const handleProfileUpdate = () => {
       loadUserData();
     };
     
-    window.addEventListener('settingsUpdated', handleProfileUpdate); // For name/email changes
-    window.addEventListener('avatarUpdated', handleProfileUpdate);   // For avatar changes
+    window.addEventListener('settingsUpdated', handleProfileUpdate); 
+    window.addEventListener('avatarUpdated', handleProfileUpdate);   
 
     return () => {
       window.removeEventListener('settingsUpdated', handleProfileUpdate);
       window.removeEventListener('avatarUpdated', handleProfileUpdate);
     };
-  }, []); // Empty dependency array: runs once on mount to load initial data and set up listeners.
+  }, []); 
 
   const fallbackInitials = userName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-5 w-5" />;
 
@@ -90,7 +88,7 @@ export function UserNav() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/settings">
+            <Link href="/dashboard#settings"> {/* Updated Link */}
               <SettingsIcon className="mr-2 h-4 w-4" />
               <span>Settings</span>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
@@ -109,5 +107,3 @@ export function UserNav() {
     </DropdownMenu>
   );
 }
-
-    
