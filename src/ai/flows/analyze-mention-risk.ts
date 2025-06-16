@@ -23,7 +23,7 @@ const AnalyzeMentionRiskOutputSchema = z.object({
   riskLevel: z
     .string()
     .describe(
-      'The risk level of the mention (RED, YELLOW, or GREEN), representing high, medium, and low risk, respectively.'
+      'The risk level of the mention (RED, ORANGE, or GREEN), representing high, medium, and low risk, respectively.' // Updated YELLOW to ORANGE
     ),
   sentiment: z.string().describe('The sentiment of the mention (positive, negative, or neutral).'),
   analysis: z.string().describe('A detailed analysis of the mention and the reasoning behind the risk level.'),
@@ -45,10 +45,13 @@ Content Excerpt: {{contentExcerpt}}
 Source Type: {{sourceType}}
 Platform: {{platform}}
 
-Provide a riskLevel (RED, YELLOW, or GREEN) and a sentiment (positive, negative, or neutral). Also, provide a detailed analysis of the mention and the reasoning behind the risk level.
+Provide a riskLevel (RED, ORANGE, or GREEN) and a sentiment (positive, negative, or neutral). Also, provide a detailed analysis of the mention and the reasoning behind the risk level.
+RED signifies high risk, immediate attention needed.
+ORANGE signifies medium risk, potential concern.
+GREEN signifies low risk, minor or no concern.
 
 Ensure that the response is returned in JSON format.
-`,
+`, // Updated YELLOW to ORANGE in prompt
 });
 
 const analyzeMentionRiskFlow = ai.defineFlow(

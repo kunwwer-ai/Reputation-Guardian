@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface LegalCaseCardProps {
   legalCase: LegalCase;
@@ -75,17 +76,17 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
   const getStatusBadgeVariant = (status: LegalCase['case_status']) => {
     switch (status) {
       case 'Active': return 'destructive';
-      case 'Potential': return 'default'; // blue
-      case 'Settled': return 'default'; // green - but primary is blue, let's use that
+      case 'Potential': return 'default'; 
+      case 'Settled': return 'default'; 
       case 'Dismissed': return 'secondary';
       default: return 'outline';
     }
   };
   
-  const getRiskIcon = (riskColor?: '🔴' | '🟡' | '🟢') => {
+  const getRiskIcon = (riskColor?: '🔴' | '🟠' | '🟢') => {
     switch (riskColor) {
       case '🔴': return <AlertTriangle className="h-5 w-5 text-red-500" />;
-      case '🟡': return <Info className="h-5 w-5 text-yellow-500" />;
+      case '🟠': return <AlertTriangle className="h-5 w-5 text-orange-500" />; // Changed from Info to AlertTriangle
       case '🟢': return <CheckCircle2 className="h-5 w-5 text-green-500" />;
       default: return <FileText className="h-5 w-5 text-gray-400" />;
     }
@@ -159,36 +160,38 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
                 Fill in the details to generate a DMCA letter for this case. Some fields are pre-filled from the profile and linked mention (if any).
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto p-1">
-              <div className="space-y-1">
-                <Label htmlFor="dmca-mentionTitle">Infringing Content Title</Label>
-                <Input id="dmca-mentionTitle" value={dmcaFormData.mentionTitle} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionTitle: e.target.value})} placeholder="e.g., Unauthorized copy of my photo"/>
+            <ScrollArea className="max-h-[60vh] p-1">
+              <div className="grid gap-4 py-4 pr-2">
+                <div className="space-y-1">
+                  <Label htmlFor="dmca-mentionTitle">Infringing Content Title</Label>
+                  <Input id="dmca-mentionTitle" value={dmcaFormData.mentionTitle} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionTitle: e.target.value})} placeholder="e.g., Unauthorized copy of my photo"/>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="dmca-mentionUrl">Infringing Content URL *</Label>
+                  <Input id="dmca-mentionUrl" value={dmcaFormData.mentionUrl} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionUrl: e.target.value})} placeholder="https://example.com/infringing-page" required />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="dmca-originalWorkDescription">Original Work Description *</Label>
+                  <Textarea id="dmca-originalWorkDescription" value={dmcaFormData.originalWorkDescription} onChange={(e) => setDmcaFormData({...dmcaFormData, originalWorkDescription: e.target.value})} placeholder="Detailed description of your original copyrighted work..." required />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="dmca-fullName">Copyright Holder Name</Label>
+                  <Input id="dmca-fullName" value={dmcaFormData.fullName} onChange={(e) => setDmcaFormData({...dmcaFormData, fullName: e.target.value})} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="dmca-address">Address</Label>
+                  <Input id="dmca-address" value={dmcaFormData.address} onChange={(e) => setDmcaFormData({...dmcaFormData, address: e.target.value})} />
+                </div>
+                 <div className="space-y-1">
+                  <Label htmlFor="dmca-email">Email</Label>
+                  <Input id="dmca-email" type="email" value={dmcaFormData.email} onChange={(e) => setDmcaFormData({...dmcaFormData, email: e.target.value})} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="dmca-phoneNumber">Phone Number</Label>
+                  <Input id="dmca-phoneNumber" value={dmcaFormData.phoneNumber} onChange={(e) => setDmcaFormData({...dmcaFormData, phoneNumber: e.target.value})} />
+                </div>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="dmca-mentionUrl">Infringing Content URL *</Label>
-                <Input id="dmca-mentionUrl" value={dmcaFormData.mentionUrl} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionUrl: e.target.value})} placeholder="https://example.com/infringing-page" required />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="dmca-originalWorkDescription">Original Work Description *</Label>
-                <Textarea id="dmca-originalWorkDescription" value={dmcaFormData.originalWorkDescription} onChange={(e) => setDmcaFormData({...dmcaFormData, originalWorkDescription: e.target.value})} placeholder="Detailed description of your original copyrighted work..." required />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="dmca-fullName">Copyright Holder Name</Label>
-                <Input id="dmca-fullName" value={dmcaFormData.fullName} onChange={(e) => setDmcaFormData({...dmcaFormData, fullName: e.target.value})} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="dmca-address">Address</Label>
-                <Input id="dmca-address" value={dmcaFormData.address} onChange={(e) => setDmcaFormData({...dmcaFormData, address: e.target.value})} />
-              </div>
-               <div className="space-y-1">
-                <Label htmlFor="dmca-email">Email</Label>
-                <Input id="dmca-email" type="email" value={dmcaFormData.email} onChange={(e) => setDmcaFormData({...dmcaFormData, email: e.target.value})} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="dmca-phoneNumber">Phone Number</Label>
-                <Input id="dmca-phoneNumber" value={dmcaFormData.phoneNumber} onChange={(e) => setDmcaFormData({...dmcaFormData, phoneNumber: e.target.value})} />
-              </div>
-            </div>
+            </ScrollArea>
             <DialogFooter>
               <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
               <Button onClick={handleGenerateDMCA} disabled={isGenerating}>
@@ -205,6 +208,3 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
     </Card>
   );
 }
-
-// ScrollArea component used above
-import { ScrollArea } from "@/components/ui/scroll-area";

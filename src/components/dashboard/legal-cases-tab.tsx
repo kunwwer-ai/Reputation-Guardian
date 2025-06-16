@@ -11,10 +11,10 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 // Mock Data Updated for Kunwer Sachdev
 const MOCK_PROFILE: Profile = {
   id: "profile1",
-  full_name: "Kunwer Sachdev", // Updated
-  entity_type: "person",    // Updated
+  full_name: "Kunwer Sachdev", 
+  entity_type: "person",    
   reputation_score: 82,
-  threat_level: "GREEN",
+  threat_level: "ORANGE", // Assuming default is ORANGE now
   verified: true,
   last_updated: new Date(),
 };
@@ -23,10 +23,10 @@ const initialMockLegalCases: LegalCase[] = [
   {
     id: "lc1",
     profileId: "profile1",
-    case_id: "KS-IP-2023-007", // Updated Case ID
+    case_id: "KS-IP-2023-007", 
     court: "Tech Patent Tribunal",
     case_status: "Potential",
-    risk_color: "🟡",
+    risk_color: "🟠", // Updated from 🟡
     filing_date: new Date("2023-11-05"),
     summary: "Potential intellectual property dispute regarding a new energy storage patent. Preliminary discussions underway.",
     documents: [{ name: "Patent Application Preview.pdf", url: "#doc1" }, { name: "Initial Correspondence.pdf", url: "#doc2" }],
@@ -36,7 +36,7 @@ const initialMockLegalCases: LegalCase[] = [
   {
     id: "lc2",
     profileId: "profile1",
-    case_id: "DMCA-KS2024-002", // Updated Case ID
+    case_id: "DMCA-KS2024-002", 
     court: "DMCA Takedown Request",
     case_status: "Settled", 
     risk_color: "🟢",
@@ -44,21 +44,20 @@ const initialMockLegalCases: LegalCase[] = [
     summary: "DMCA takedown notice sent for unauthorized use of Kunwer Sachdev's interview footage on a third-party video platform.",
     removal_status: "Successful",
     last_action_date: new Date("2024-02-05"),
-    associated_mention_id: "mention_video_infringement", // New mock mention ID
+    associated_mention_id: "mention_video_infringement", 
   },
 ];
 
-// Updated MOCK_MENTIONS to align with new legal case context
 const MOCK_MENTIONS: Mention[] = [ 
    {
     id: "mention_video_infringement",
     profileId: "profile1",
-    source_type: "other", // Assuming video platform
+    source_type: "other", 
     platform: "VideoShare Platform",
     url: "https://videoshare.example/kunwer-sachdev-unauthorized-clip", 
     title: "Unauthorized Clip of Kunwer Sachdev Interview",
     content_excerpt: "This video channel posted a 10-minute segment from Kunwer Sachdev's recent keynote without any permission or credit...",
-    timestamp: new Date(Date.now() - 86400000 * 20), // 20 days ago
+    timestamp: new Date(Date.now() - 86400000 * 20), 
   },
 ];
 
@@ -67,7 +66,6 @@ export function LegalCasesTab() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching data
     const timer = setTimeout(() => {
       setLegalCases(initialMockLegalCases);
       setIsLoading(false);
@@ -138,4 +136,3 @@ export function LegalCasesTab() {
     </div>
   );
 }
-

@@ -5,7 +5,7 @@ export interface Profile {
   full_name: string;
   entity_type: 'person' | 'company';
   reputation_score: number;
-  threat_level: 'RED' | 'YELLOW' | 'GREEN';
+  threat_level: 'RED' | 'ORANGE' | 'GREEN'; // Updated from YELLOW
   verified: boolean;
   last_updated: Date;
 }
@@ -21,7 +21,7 @@ export interface EncyclopediaSourceLink {
   
   // Fields to store results from MentionCard actions, making the encyclopedia the source of truth
   sentiment?: 'positive' | 'negative' | 'neutral';
-  risk_color?: '🔴' | '🟡' | '🟢';
+  risk_color?: '🔴' | '🟠' | '🟢'; // Updated from 🟡
   gpt_analysis?: string;
   archived_evidence?: {
     screenshot_url?: string;
@@ -53,7 +53,7 @@ export interface Mention {
   title: string;
   content_excerpt: string; // This will be EncyclopediaSourceLink.excerpt
   sentiment?: 'positive' | 'negative' | 'neutral';
-  risk_color?: '🔴' | '🟡' | '🟢';
+  risk_color?: '🔴' | '🟠' | '🟢'; // Updated from 🟡
   timestamp: Date;
   gpt_analysis?: string;
   archived_evidence?: {
@@ -73,7 +73,7 @@ export interface LegalCase {
   case_id: string;
   court: string;
   case_status: 'Active' | 'Settled' | 'Potential' | 'Dismissed' | 'Appealed';
-  risk_color?: '🔴' | '🟡' | '🟢';
+  risk_color?: '🔴' | '🟠' | '🟢'; // Updated from 🟡
   filing_date: Date;
   summary: string;
   documents?: Array<{ name: string; url: string }>;
@@ -86,7 +86,7 @@ export interface LegalCase {
 
 // For GenAI interactions
 export interface RiskAnalysisResult {
-  riskLevel: 'RED' | 'YELLOW' | 'GREEN';
+  riskLevel: 'RED' | 'ORANGE' | 'GREEN'; // Updated from YELLOW
   sentiment: 'positive' | 'negative' | 'neutral';
   analysis: string;
 }
@@ -108,3 +108,4 @@ export interface GenerateDerivedContentInput {
 export interface GenerateDerivedContentResult {
   generatedText: string;
 }
+

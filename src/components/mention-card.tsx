@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle2, Info, MessageSquare, BarChartBig, Sparkles, Loader2, ExternalLink, Archive } from "lucide-react";
-import { useState, useTransition, useEffect } from "react"; // Added useEffect here
+import { useState, useTransition, useEffect } from "react"; 
 import { analyzeMentionRiskAction, summarizeExcerptAction } from "@/app/actions/mention-actions";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,8 +52,9 @@ export function MentionCard({ mention: initialMention, onUpdateMention }: Mentio
           platform: mention.platform,
         });
         
-        let riskColor: Mention['risk_color'] = '🟡';
+        let riskColor: Mention['risk_color'] = '🟠'; // Default to ORANGE if not specified
         if (result.riskLevel === 'RED') riskColor = '🔴';
+        else if (result.riskLevel === 'ORANGE') riskColor = '🟠';
         else if (result.riskLevel === 'GREEN') riskColor = '🟢';
 
         const updatedMentionData: Partial<Mention> = {
@@ -117,10 +118,10 @@ export function MentionCard({ mention: initialMention, onUpdateMention }: Mentio
     }
   };
 
-  const getRiskIcon = (riskColor?: '🔴' | '🟡' | '🟢') => {
+  const getRiskIcon = (riskColor?: '🔴' | '🟠' | '🟢') => {
     switch (riskColor) {
       case '🔴': return <AlertTriangle className="h-5 w-5 text-red-500" />;
-      case '🟡': return <Info className="h-5 w-5 text-yellow-500" />;
+      case '🟠': return <AlertTriangle className="h-5 w-5 text-orange-500" />; // Changed from Info and yellow to AlertTriangle and orange
       case '🟢': return <CheckCircle2 className="h-5 w-5 text-green-500" />;
       default: return <MessageSquare className="h-5 w-5 text-gray-400" />;
     }
@@ -243,4 +244,3 @@ export function MentionCard({ mention: initialMention, onUpdateMention }: Mentio
     </Card>
   );
 }
-

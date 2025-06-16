@@ -8,13 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 const MOCK_PROFILE: Profile = {
   id: "profile1",
   full_name: "Kunwer Sachdev",
   entity_type: "person",
   reputation_score: 82,
-  threat_level: "GREEN",
+  threat_level: "ORANGE", // Updated from GREEN to ORANGE for testing
   verified: true,
   last_updated: new Date(Date.now() - 86400000 * 3), 
 };
@@ -61,7 +62,6 @@ export function OverviewTab() {
             <div className="h-20 w-20 bg-muted rounded-full animate-pulse"></div>
             <div>
                 <div className="h-7 bg-muted rounded w-48 animate-pulse"></div>
-                <div className="h-4 bg-muted rounded w-32 mt-2 animate-pulse"></div>
             </div>
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
@@ -81,20 +81,20 @@ export function OverviewTab() {
     );
   }
 
-  const getThreatBadgeVariant = (level: Profile['threat_level']) => {
+  const getThreatBadgeClasses = (level: Profile['threat_level']) => {
     switch (level) {
-      case 'RED': return 'destructive';
-      case 'YELLOW': return 'default'; 
-      case 'GREEN': return 'default'; 
-      default: return 'secondary';
+      case 'RED': return 'bg-destructive text-destructive-foreground';
+      case 'ORANGE': return 'bg-orange-500 text-primary-foreground'; // Using Tailwind orange
+      case 'GREEN': return 'bg-green-600 text-primary-foreground'; // Using Tailwind green
+      default: return 'bg-secondary text-secondary-foreground';
     }
   };
 
   const getThreatIcon = (level: Profile['threat_level']) => {
     switch(level) {
-        case 'RED': return <AlertTriangle className="mr-1 h-4 w-4" />;
-        case 'YELLOW': return <AlertTriangle className="mr-1 h-4 w-4" />; 
-        case 'GREEN': return <ShieldCheck className="mr-1 h-4 w-4" />;
+        case 'RED': return <AlertTriangle className="mr-1 h-4 w-4 text-destructive" />;
+        case 'ORANGE': return <AlertTriangle className="mr-1 h-4 w-4 text-orange-500" />; 
+        case 'GREEN': return <ShieldCheck className="mr-1 h-4 w-4 text-green-600" />;
         default: return null;
     }
   };
@@ -116,9 +116,6 @@ export function OverviewTab() {
             </div>
             <div>
               <CardTitle className="text-3xl font-headline text-primary-foreground">{profile.full_name}</CardTitle>
-              {/* <CardDescription className="text-primary-foreground/80 capitalize">
-                {profile.entity_type}
-              </CardDescription> */}
             </div>
             <div className="ml-auto flex items-center gap-2">
                 {profile.verified && <Badge variant="secondary" className="bg-green-500 text-white"><ShieldCheck className="mr-1 h-4 w-4" />Verified</Badge>}
@@ -129,7 +126,7 @@ export function OverviewTab() {
           <div>
             <div className="flex justify-between items-center mb-1">
               <h3 className="text-lg font-semibold">Reputation Score</h3>
-              <span className={`text-2xl font-bold ${profile.reputation_score >= 70 ? 'text-green-600' : profile.reputation_score >= 40 ? 'text-yellow-500' : 'text-red-500'}`}>
+              <span className={`text-2xl font-bold ${profile.reputation_score >= 70 ? 'text-green-600' : profile.reputation_score >= 40 ? 'text-orange-500' : 'text-red-500'}`}>
                 {profile.reputation_score} / 100
               </span>
             </div>
@@ -145,7 +142,7 @@ export function OverviewTab() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Badge variant={getThreatBadgeVariant(profile.threat_level)} className="text-lg px-3 py-1">{profile.threat_level}</Badge>
+                <Badge className={cn("text-lg px-3 py-1", getThreatBadgeClasses(profile.threat_level))}>{profile.threat_level}</Badge>
               </CardContent>
             </Card>
             <Card className="bg-card/50">
@@ -172,4 +169,3 @@ export function OverviewTab() {
     </div>
   );
 }
-
