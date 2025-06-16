@@ -117,7 +117,7 @@ export function OverviewTab() {
             <div>
               <CardTitle className="text-3xl font-headline text-primary-foreground">{profile.full_name}</CardTitle>
               <CardDescription className="text-primary-foreground/80 capitalize">
-                {profile.entity_type} - Last Updated: {profile.last_updated.toLocaleDateString()}
+                {profile.entity_type}
               </CardDescription>
             </div>
             <div className="ml-auto flex items-center gap-2">
@@ -172,3 +172,4 @@ export function OverviewTab() {
     </div>
   );
 }
+
