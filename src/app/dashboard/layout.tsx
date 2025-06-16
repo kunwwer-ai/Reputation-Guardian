@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { AppLogo } from '@/components/icons';
 import { UserNav } from '@/components/user-nav';
+import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -24,7 +26,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </a>
           </div>
         </div>
-        <UserNav />
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" aria-label="Search">
+            <Search className="h-5 w-5" />
+          </Button>
+          <UserNav />
+        </div>
       </header>
       <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
         {children}
