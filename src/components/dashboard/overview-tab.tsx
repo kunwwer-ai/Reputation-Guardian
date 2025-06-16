@@ -5,7 +5,7 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, TrendingUp, TrendingDown, User, BarChartHorizontalBig } from "lucide-react";
+import { ShieldCheck, User, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -19,7 +19,7 @@ const MOCK_PROFILE: Profile = {
   reputation_score: 82,
   threat_level: "ORANGE", 
   verified: true,
-  last_updated: new Date(Date.now() - 86400000 * 3), 
+  // last_updated and entity_type removed from display
 };
 
 export function OverviewTab() {
@@ -57,6 +57,24 @@ export function OverviewTab() {
     };
   }, []);
 
+  const getThreatBadgeVariant = (level: 'RED' | 'ORANGE' | 'GREEN') => {
+    switch (level) {
+      case 'RED': return 'destructive';
+      case 'ORANGE': return { className: "bg-orange-500 text-primary-foreground hover:bg-orange-500/90" };
+      case 'GREEN': return 'default'; 
+      default: return 'outline';
+    }
+  };
+
+  const getThreatIcon = (level: 'RED' | 'ORANGE' | 'GREEN') => {
+    switch (level) {
+      case 'RED': return <AlertTriangle className="mr-1 h-4 w-4" />;
+      case 'ORANGE': return <AlertTriangle className="mr-1 h-4 w-4 text-orange-500" />; 
+      case 'GREEN': return <ShieldCheck className="mr-1 h-4 w-4" />;
+      default: return <ShieldCheck className="mr-1 h-4 w-4" />; 
+    }
+  };
+
 
   if (isLoading || !profile) {
     return (
@@ -85,6 +103,7 @@ export function OverviewTab() {
   }
   
   const avatarFallbackName = profile.full_name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-10 w-10" />;
+  const threatBadgeStyle = getThreatBadgeVariant(profile.threat_level);
 
   return (
     <div className="space-y-6">
@@ -104,6 +123,13 @@ export function OverviewTab() {
             </div>
             <div className="ml-auto flex items-center gap-2">
                 {profile.verified && <Badge variant="secondary" className="bg-green-500 text-white"><ShieldCheck className="mr-1 h-4 w-4" />Verified</Badge>}
+                <Badge 
+                  variant={typeof threatBadgeStyle === 'string' ? threatBadgeStyle as any : 'default'}
+                  className={typeof threatBadgeStyle === 'object' ? threatBadgeStyle.className : ''}
+                >
+                  {getThreatIcon(profile.threat_level)}
+                  Threat: {profile.threat_level}
+                </Badge>
             </div>
           </div>
         </CardHeader>
@@ -118,21 +144,7 @@ export function OverviewTab() {
             <Progress value={profile.reputation_score} aria-label={`Reputation score: ${profile.reputation_score} out of 100`} className="h-3 [&>div]:bg-gradient-to-r [&>div]:from-accent [&>div]:to-primary" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-             <Card className="bg-card/50">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center">
-                    <BarChartHorizontalBig className="mr-2 h-5 w-5 text-primary" />
-                    Content Analytics
-                </CardTitle>
-                <CardDescription>Track online content volume over time.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                 <Button onClick={() => router.push('/dashboard#analytics')}>
-                    View Monthly Trends
-                 </Button>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="bg-card/50">
               <CardHeader><CardTitle className="text-base flex items-center"><TrendingUp className="mr-2 h-5 w-5 text-green-500" />Positive Mentions</CardTitle></CardHeader>
               <CardContent><p className="text-3xl font-bold">25</p></CardContent>
