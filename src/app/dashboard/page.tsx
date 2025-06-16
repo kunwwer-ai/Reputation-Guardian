@@ -31,11 +31,12 @@ export default function DashboardPage() {
 
       if (currentUrlHash && validTabs.includes(currentUrlHash)) {
         // Hash is valid and points to a known tab
-        if (activeTab !== currentUrlHash) {
+        if (activeTab !== currentUrlHash) { // Check ensures we only update if state is out of sync
           setActiveTab(currentUrlHash);
         }
       } else {
         // Hash is empty, invalid, or points to an unknown tab. Default to 'overview'.
+        // Set activeTab to 'overview' if it's not already.
         if (activeTab !== "overview") {
           setActiveTab("overview");
         }
@@ -55,11 +56,18 @@ export default function DashboardPage() {
     return () => {
       window.removeEventListener('hashchange', syncTabWithHash, false);
     };
-  }, [router, activeTab]); // Dependencies: router for replace, activeTab to re-evaluate if it changes.
+  // Dependency on `router` for `router.replace`.
+  // It will NOT re-run just because `activeTab` was changed by `handleTabChange`,
+  // which prevents potential conflicts.
+  }, [router]);
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value); // Update internal state
-    router.push(`/dashboard#${value}`, { scroll: false }); // Update URL hash
+    // This is the direct handler for tab clicks.
+    // It should be the source of truth for this interaction.
+     if (activeTab !== value) { // Prevent unnecessary updates
+      setActiveTab(value); // Update internal state
+      router.push(`/dashboard#${value}`, { scroll: false }); // Update URL hash
+    }
   };
 
   return (
