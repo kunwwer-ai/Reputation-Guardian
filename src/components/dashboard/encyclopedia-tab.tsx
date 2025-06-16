@@ -11,10 +11,22 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 
-const LOCAL_STORAGE_KEY = "encyclopediaEntries_v7"; // Updated Key for new structure
+const LOCAL_STORAGE_KEY = "encyclopediaEntries_v8"; // Updated Key for new structure
 
 // Updated Mock Encyclopedia Entries - Category-based structure
 const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
+  {
+    id: "enc-all-search", // New ID for the general search section
+    profileId: "profile1",
+    section_title: "General Web Search - Kunwer Sachdev & Variations",
+    content_markdown: "Collect links from various search engines (Google, Bing, DuckDuckGo, etc.) for 'Kunwer Sachdev' and its common spelling variations like 'Kunwar Sachdeva', 'Kuwer Sachdeva', 'Kumar Sachdeva'. This section is for a broad overview of search presence before categorizing.",
+    source_verified: false,
+    disputed_flag: false,
+    source_links: [
+      { title: "Example: Google Result - Kunwer Sachdev", url: "https://google.com/search?q=Kunwer+Sachdev+example+result+1" },
+      { title: "Example: Bing Result - Kunwar Sachdeva", url: "https://bing.com/search?q=Kunwar+Sachdeva+example+result+2" },
+    ],
+  },
   {
     id: "enc-news",
     profileId: "profile1",
@@ -160,7 +172,8 @@ export function EncyclopediaTab() {
     }
     return entries.filter(entry =>
       entry.section_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      entry.content_markdown.toLowerCase().includes(searchQuery.toLowerCase())
+      entry.content_markdown.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (entry.source_links && entry.source_links.some(link => link.title.toLowerCase().includes(searchQuery.toLowerCase()) || link.url.toLowerCase().includes(searchQuery.toLowerCase())))
     );
   }, [entries, searchQuery]);
 
@@ -239,9 +252,9 @@ export function EncyclopediaTab() {
       </Card>
 
       <div className="flex justify-between items-center pt-4">
-        <h2 className="text-2xl font-semibold font-headline tracking-tight">Link Categories</h2>
-        <Button onClick={handleAddEntry} aria-label="Add new link category">
-          <PlusCircle className="mr-2 h-4 w-4" /> Add Category
+        <h2 className="text-2xl font-semibold font-headline tracking-tight">Link Collections</h2>
+        <Button onClick={handleAddEntry} aria-label="Add new link collection">
+          <PlusCircle className="mr-2 h-4 w-4" /> Add Collection
         </Button>
       </div>
 
@@ -249,7 +262,7 @@ export function EncyclopediaTab() {
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search link categories..."
+          placeholder="Search link collections (titles, descriptions, or link content)..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-10 shadow-sm"
@@ -260,9 +273,9 @@ export function EncyclopediaTab() {
          <Card className="shadow-lg">
           <CardContent className="pt-6">
             {searchQuery ? (
-                <p>No link categories match your search for "{searchQuery}".</p>
+                <p>No link collections match your search for "{searchQuery}".</p>
             ) : (
-                <p>No link categories have been created yet. Click "Add Category" to get started, or populate the default categories.</p>
+                <p>No link collections have been created yet. Click "Add Collection" to get started, or populate the default collections.</p>
             )}
           </CardContent>
         </Card>
@@ -276,6 +289,8 @@ export function EncyclopediaTab() {
     </div>
   );
 }
+    
+
     
 
     
