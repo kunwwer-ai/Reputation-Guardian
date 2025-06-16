@@ -5,11 +5,9 @@ import type { Profile } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User, Edit3, Save, XCircle } from "lucide-react";
+import { ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, User } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { useState, useEffect, useRef } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 
 const MOCK_PROFILE: Profile = {
   id: "profile1",
@@ -24,39 +22,30 @@ const MOCK_PROFILE: Profile = {
 export function OverviewTab() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  const [savedAvatarSrc, setSavedAvatarSrc] = useState<string>("");
-  const [previewAvatarSrc, setPreviewAvatarSrc] = useState<string | null>(null);
+  const [currentAvatarSrc, setCurrentAvatarSrc] = useState<string>("");
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
-  const loadProfileData = () => {
-    let currentProfile = MOCK_PROFILE;
+  const loadProfileAndAvatarData = () => {
+    let currentProfileData = MOCK_PROFILE;
     const storedFullName = localStorage.getItem("settings_fullName");
     if (storedFullName) {
-      currentProfile = { ...currentProfile, full_name: storedFullName };
+      currentProfileData = { ...currentProfileData, full_name: storedFullName };
     }
-    setProfile(currentProfile);
+    setProfile(currentProfileData);
 
     const storedAvatar = localStorage.getItem("settings_avatarSrc");
-    const initialChar = currentProfile.full_name.charAt(0).toUpperCase() || 'P';
+    const initialChar = currentProfileData.full_name.charAt(0).toUpperCase() || 'P';
     const placeholderAvatar = `https://placehold.co/80x80.png?text=${initialChar}`;
-    setSavedAvatarSrc(storedAvatar || placeholderAvatar);
-    
-    // If there's no stored custom avatar, ensure preview is also null initially
-    if (!storedAvatar) {
-        setPreviewAvatarSrc(null);
-    }
+    setCurrentAvatarSrc(storedAvatar || placeholderAvatar);
   };
 
   useEffect(() => {
-    loadProfileData();
+    loadProfileAndAvatarData();
     setIsLoading(false);
     
-    const handleSettingsUpdate = () => loadProfileData();
+    const handleSettingsUpdate = () => loadProfileAndAvatarData();
     window.addEventListener('settingsUpdated', handleSettingsUpdate);
-    window.addEventListener('avatarUpdated', handleSettingsUpdate); // Listen for avatar changes too
+    window.addEventListener('avatarUpdated', handleSettingsUpdate);
 
     return () => {
       window.removeEventListener('settingsUpdated', handleSettingsUpdate);
@@ -64,34 +53,6 @@ export function OverviewTab() {
     };
   }, []);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewAvatarSrc(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSavePhoto = () => {
-    if (previewAvatarSrc) {
-      localStorage.setItem("settings_avatarSrc", previewAvatarSrc);
-      setSavedAvatarSrc(previewAvatarSrc);
-      setPreviewAvatarSrc(null); // Clear preview
-      toast({ title: "Avatar Updated", description: "Your new avatar has been saved." });
-      window.dispatchEvent(new CustomEvent('avatarUpdated'));
-    }
-  };
-
-  const handleCancelPhotoChange = () => {
-    setPreviewAvatarSrc(null); // Clear preview
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
 
   if (isLoading || !profile) {
     return (
@@ -139,7 +100,6 @@ export function OverviewTab() {
   };
   
   const avatarFallbackName = profile.full_name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-10 w-10" />;
-  const displayAvatarSrc = previewAvatarSrc || savedAvatarSrc;
 
   return (
     <div className="space-y-6">
@@ -148,19 +108,12 @@ export function OverviewTab() {
           <div className="flex items-center gap-4">
              <div className="relative group">
               <Avatar className="h-20 w-20 border-4 border-background shadow-md">
-                <AvatarImage src={displayAvatarSrc} alt={profile.full_name} data-ai-hint="person portrait" />
+                <AvatarImage src={currentAvatarSrc} alt={profile.full_name} data-ai-hint="person portrait" />
                 <AvatarFallback className="text-3xl bg-primary-foreground text-primary">
                   {avatarFallbackName}
                 </AvatarFallback>
               </Avatar>
             </div>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleImageChange} 
-              style={{ display: 'none' }} 
-              accept="image/*" 
-            />
             <div>
               <CardTitle className="text-3xl font-headline text-primary-foreground">{profile.full_name}</CardTitle>
               <CardDescription className="text-primary-foreground/80 capitalize">
@@ -173,22 +126,6 @@ export function OverviewTab() {
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={triggerFileInput}>
-              <Edit3 className="mr-2 h-4 w-4" /> Change Photo
-            </Button>
-            {previewAvatarSrc && (
-              <>
-                <Button onClick={handleSavePhoto}>
-                  <Save className="mr-2 h-4 w-4" /> Save Photo
-                </Button>
-                <Button variant="ghost" onClick={handleCancelPhotoChange}>
-                  <XCircle className="mr-2 h-4 w-4" /> Cancel
-                </Button>
-              </>
-            )}
-          </div>
-
           <div>
             <div className="flex justify-between items-center mb-1">
               <h3 className="text-lg font-semibold">Reputation Score</h3>

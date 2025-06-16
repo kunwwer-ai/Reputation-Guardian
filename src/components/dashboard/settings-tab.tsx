@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, Edit3, Save, XCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export function SettingsTab() {
@@ -17,6 +19,10 @@ export function SettingsTab() {
   // Profile Settings State
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [savedAvatarSrc, setSavedAvatarSrc] = useState<string>("");
+  const [previewAvatarSrc, setPreviewAvatarSrc] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   // Notification Preferences State
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -34,12 +40,20 @@ export function SettingsTab() {
   // Load settings from localStorage on component mount
   useEffect(() => {
     const storedFullName = localStorage.getItem("settings_fullName");
-    if (storedFullName) setFullName(storedFullName);
-    else setFullName("Kunwer Sachdev"); 
+    const currentName = storedFullName || "Kunwer Sachdev";
+    setFullName(currentName); 
 
     const storedEmail = localStorage.getItem("settings_email");
     if (storedEmail) setEmail(storedEmail);
     else setEmail("kunwer.sachdev@example.com"); 
+
+    const storedAvatar = localStorage.getItem("settings_avatarSrc");
+    const initialChar = currentName.charAt(0).toUpperCase() || 'P';
+    const placeholderAvatar = `https://placehold.co/80x80.png?text=${initialChar}`; // 80x80 for profile section
+    setSavedAvatarSrc(storedAvatar || placeholderAvatar);
+     if (!storedAvatar) {
+        setPreviewAvatarSrc(null);
+    }
 
     const storedEmailNotifications = localStorage.getItem("settings_emailNotifications");
     if (storedEmailNotifications) setEmailNotifications(JSON.parse(storedEmailNotifications));
@@ -57,9 +71,44 @@ export function SettingsTab() {
   const handleSaveProfile = () => {
     localStorage.setItem("settings_fullName", fullName);
     localStorage.setItem("settings_email", email);
+    // If name changed, and no custom avatar, update placeholder for savedAvatarSrc
+    if (!localStorage.getItem("settings_avatarSrc")) {
+        const initialChar = fullName.charAt(0).toUpperCase() || 'P';
+        setSavedAvatarSrc(`https://placehold.co/80x80.png?text=${initialChar}`);
+    }
     toast({ title: "Profile Saved", description: "Your profile information has been updated." });
     window.dispatchEvent(new CustomEvent('settingsUpdated')); 
   };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewAvatarSrc(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSavePhoto = () => {
+    if (previewAvatarSrc) {
+      localStorage.setItem("settings_avatarSrc", previewAvatarSrc);
+      setSavedAvatarSrc(previewAvatarSrc);
+      setPreviewAvatarSrc(null); 
+      toast({ title: "Avatar Updated", description: "Your new avatar has been saved." });
+      window.dispatchEvent(new CustomEvent('avatarUpdated'));
+    }
+  };
+
+  const handleCancelPhotoChange = () => {
+    setPreviewAvatarSrc(null); 
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
 
   const handleSavePreferences = () => {
     localStorage.setItem("settings_emailNotifications", JSON.stringify(emailNotifications));
@@ -85,6 +134,10 @@ export function SettingsTab() {
     setConfirmNewPassword("");
     setIsPasswordDialogOpen(false);
   };
+  
+  const displayAvatarSrc = previewAvatarSrc || savedAvatarSrc;
+  const avatarFallbackName = fullName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() || <User className="h-10 w-10" />;
+
 
   return (
     <div className="space-y-6">
@@ -93,10 +146,41 @@ export function SettingsTab() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Profile Settings</CardTitle>
-          <CardDescription>Manage your public profile information.</CardDescription>
+          <CardDescription>Manage your public profile information and avatar.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-1">
+          <div className="flex flex-col items-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
+            <Avatar className="h-20 w-20 border-2 border-muted shadow-md">
+              <AvatarImage src={displayAvatarSrc} alt={fullName} data-ai-hint="user avatar settings" />
+              <AvatarFallback className="text-3xl">
+                {avatarFallbackName}
+              </AvatarFallback>
+            </Avatar>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageChange} 
+              style={{ display: 'none' }} 
+              accept="image/*" 
+            />
+            <div className="flex flex-col sm:flex-row gap-2 items-center">
+              <Button variant="outline" onClick={triggerFileInput}>
+                <Edit3 className="mr-2 h-4 w-4" /> Change Photo
+              </Button>
+              {previewAvatarSrc && (
+                <>
+                  <Button onClick={handleSavePhoto}>
+                    <Save className="mr-2 h-4 w-4" /> Save Photo
+                  </Button>
+                  <Button variant="ghost" onClick={handleCancelPhotoChange}>
+                    <XCircle className="mr-2 h-4 w-4" /> Cancel
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-1 pt-4">
             <Label htmlFor="fullName">Full Name</Label>
             <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
           </div>
