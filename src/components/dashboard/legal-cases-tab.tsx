@@ -14,7 +14,7 @@ const MOCK_PROFILE: Profile = {
   full_name: "Kunwer Sachdev", 
   entity_type: "person",    
   reputation_score: 82,
-  threat_level: "ORANGE", // Assuming default is ORANGE now
+  threat_level: "ORANGE", 
   verified: true,
   last_updated: new Date(),
 };
@@ -26,7 +26,7 @@ const initialMockLegalCases: LegalCase[] = [
     case_id: "KS-IP-2023-007", 
     court: "Tech Patent Tribunal",
     case_status: "Potential",
-    risk_color: "🟠", // Updated from 🟡
+    risk_color: "🟠", 
     filing_date: new Date("2023-11-05"),
     summary: "Potential intellectual property dispute regarding a new energy storage patent. Preliminary discussions underway.",
     documents: [{ name: "Patent Application Preview.pdf", url: "#doc1" }, { name: "Initial Correspondence.pdf", url: "#doc2" }],
