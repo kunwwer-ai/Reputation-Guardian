@@ -116,9 +116,9 @@ export function OverviewTab() {
             </div>
             <div>
               <CardTitle className="text-3xl font-headline text-primary-foreground">{profile.full_name}</CardTitle>
-              <CardDescription className="text-primary-foreground/80 capitalize">
+              {/* <CardDescription className="text-primary-foreground/80 capitalize">
                 {profile.entity_type}
-              </CardDescription>
+              </CardDescription> */}
             </div>
             <div className="ml-auto flex items-center gap-2">
                 {profile.verified && <Badge variant="secondary" className="bg-green-500 text-white"><ShieldCheck className="mr-1 h-4 w-4" />Verified</Badge>}
