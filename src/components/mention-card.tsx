@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle2, Info, MessageSquare, BarChartBig, Sparkles, Loader2, ExternalLink, Archive } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react"; // Added useEffect here
 import { analyzeMentionRiskAction, summarizeExcerptAction } from "@/app/actions/mention-actions";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -232,7 +232,8 @@ export function MentionCard({ mention: initialMention, onUpdateMention }: Mentio
               </DialogClose>
                 <Button type="button" onClick={() => {
                     handleSaveEvidence();
-                    const closeButton = document.querySelector('[data-radix-dialog-default-open="false"]'); // Find a way to close dialog
+                    // Attempt to close dialog. A more robust way might involve controlling open state via prop.
+                    const closeButton = (document.querySelector('[role="dialog"]') as HTMLElement)?.querySelector('button[aria-label="Close"], button:not([type="submit"])');
                     if (closeButton instanceof HTMLElement) closeButton.click();
                 }}>Save Evidence</Button>
             </DialogFooter>
@@ -242,3 +243,4 @@ export function MentionCard({ mention: initialMention, onUpdateMention }: Mentio
     </Card>
   );
 }
+
