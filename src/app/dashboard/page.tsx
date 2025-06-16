@@ -9,7 +9,7 @@ import { EncyclopediaTab } from "@/components/dashboard/encyclopedia-tab";
 import { NewsFeedTab } from "@/components/dashboard/news-feed-tab";
 import { ContentGenerationTab } from "@/components/dashboard/content-generation-tab";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 // Placeholder for RiskAssessmentTool
 function RiskAssessmentToolPlaceholder() {
@@ -21,22 +21,28 @@ const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-
 export default function DashboardPage() {
   const router = useRouter();
   // Initialize activeTab to a default. Server and initial client render will use this.
-  const [activeTab, setActiveTab] = useState("overview"); 
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     // This function syncs the active tab state with the current URL hash.
     // It runs only on the client, after initial hydration.
     const syncTabWithHash = () => {
-      const currentHash = window.location.hash.substring(1);
-      if (currentHash && validTabs.includes(currentHash)) {
-        if (activeTab !== currentHash) { 
-          setActiveTab(currentHash);
+      const currentUrlHash = window.location.hash.substring(1);
+
+      if (currentUrlHash && validTabs.includes(currentUrlHash)) {
+        // Hash is valid and points to a known tab
+        if (activeTab !== currentUrlHash) {
+          setActiveTab(currentUrlHash);
         }
       } else {
-        if (activeTab !== "overview") { 
-            setActiveTab("overview");
+        // Hash is empty, invalid, or points to an unknown tab. Default to 'overview'.
+        if (activeTab !== "overview") {
+          setActiveTab("overview");
         }
-        if (window.location.pathname === '/dashboard' && currentHash !== 'overview' && currentHash !== '') {
+        // If current URL is /dashboard and hash is not #overview (or is problematic)
+        // update the URL to reflect the default 'overview' tab.
+        // This check prevents unnecessary router.replace calls if already correct.
+        if (window.location.pathname === '/dashboard' && currentUrlHash !== "overview") {
            router.replace('/dashboard#overview', { scroll: false });
         }
       }
@@ -44,17 +50,18 @@ export default function DashboardPage() {
 
     syncTabWithHash(); // Sync on initial client mount
 
+    // Listen for hash changes (e.g., browser back/forward)
     window.addEventListener('hashchange', syncTabWithHash, false);
     return () => {
       window.removeEventListener('hashchange', syncTabWithHash, false);
     };
-  }, [router, activeTab]); 
+  }, [router, activeTab]); // Dependencies: router for replace, activeTab to re-evaluate if it changes.
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value); 
-    router.push(`/dashboard#${value}`, { scroll: false }); 
+    setActiveTab(value); // Update internal state
+    router.push(`/dashboard#${value}`, { scroll: false }); // Update URL hash
   };
-  
+
   return (
     <div className="flex flex-col h-full">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-grow flex flex-col">
@@ -67,7 +74,7 @@ export default function DashboardPage() {
           <TabsTrigger value="risk-assessment">Risk Assessment</TabsTrigger>
           <TabsTrigger value="content-generation">Content Generation</TabsTrigger>
         </TabsList>
-        
+
         <div className="flex-grow overflow-y-auto pb-10">
           <TabsContent value="overview" className="mt-0">
             <OverviewTab />
