@@ -100,6 +100,7 @@ export interface DMCALetterResult {
 }
 
 export interface GenerateDerivedContentInput {
+  profileName: string;
   newsTitle: string;
   newsExcerpt: string;
   contentType: "Summary" | "Tweet" | "LinkedIn Post" | "Key Takeaways" | "Press Release Snippet";

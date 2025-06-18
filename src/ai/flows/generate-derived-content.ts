@@ -10,10 +10,10 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import type { GenerateDerivedContentInput as ApiInputType } from '@/types';
 
 // Define Zod schema based on the TypeScript interface
 const GenerateDerivedContentInputSchema = z.object({
+  profileName: z.string().describe('The name of the profile for whom the content is being generated.'),
   newsTitle: z.string().describe('The title of the news item.'),
   newsExcerpt: z.string().describe('The excerpt or summary of the news item.'),
   contentType: z.enum(["Summary", "Tweet", "LinkedIn Post", "Key Takeaways", "Press Release Snippet"])
@@ -36,8 +36,8 @@ const prompt = ai.definePrompt({
   name: 'generateDerivedContentPrompt',
   input: {schema: GenerateDerivedContentInputSchema},
   output: {schema: GenerateDerivedContentOutputSchema},
-  prompt: `You are an expert content creator and public relations specialist.
-Your task is to generate a "{{contentType}}" based on the following news item.
+  prompt: `You are an expert content creator and public relations specialist for {{{profileName}}}.
+Your task is to generate a "{{contentType}}" based on the following news item, potentially relating to {{{profileName}}} or their areas of interest.
 
 News Item Title: {{{newsTitle}}}
 News Item Excerpt: {{{newsExcerpt}}}
@@ -64,3 +64,4 @@ const generateDerivedContentFlow = ai.defineFlow(
     return output!;
   }
 );
+

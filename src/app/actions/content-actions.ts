@@ -15,3 +15,4 @@ export async function generateDerivedContentAction(
     throw new Error("Failed to generate content. Please try again.");
   }
 }
+

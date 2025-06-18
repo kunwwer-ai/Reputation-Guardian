@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { GenerateDerivedContentResult, GenerateDerivedContentInput, EncyclopediaSourceLink } from "@/types";
+import type { GenerateDerivedContentResult, GenerateDerivedContentInput as TypesGenInput, EncyclopediaSourceLink } from "@/types";
 import { useState, useEffect, useTransition, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { generateDerivedContentAction } from "@/app/actions/content-actions";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, User } from "lucide-react";
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
+import type { GenerateDerivedContentInput as FlowGenInputType } from "@/ai/flows/generate-derived-content";
 
-const contentTypes: GenerateDerivedContentInput['contentType'][] = [
+
+const contentTypes: TypesGenInput['contentType'][] = [
   "Summary",
   "Tweet",
   "LinkedIn Post",
@@ -23,8 +25,9 @@ const contentTypes: GenerateDerivedContentInput['contentType'][] = [
 
 export function ContentGenerationTab() {
   const { entries } = useEncyclopediaContext();
+  const [profileNameState, setProfileNameState] = useState("Kunwer Sachdev");
   const [selectedNewsLinkId, setSelectedNewsLinkId] = useState<string | undefined>(undefined);
-  const [selectedContentType, setSelectedContentType] = useState<GenerateDerivedContentInput['contentType'] | undefined>(contentTypes[0]);
+  const [selectedContentType, setSelectedContentType] = useState<TypesGenInput['contentType'] | undefined>(contentTypes[0]);
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [isGenerating, startGenerating] = useTransition();
   const { toast } = useToast();
@@ -37,10 +40,13 @@ export function ContentGenerationTab() {
   }, [entries]);
 
   useEffect(() => {
+    const storedFullName = localStorage.getItem("settings_fullName");
+    setProfileNameState(storedFullName || "Kunwer Sachdev");
+
     if (newsSourceLinks.length > 0 && !selectedNewsLinkId) {
       setSelectedNewsLinkId(newsSourceLinks[0].id);
     }
-    if (entries) { // entries loaded from context
+    if (entries) { 
         setIsLoading(false);
     }
   }, [newsSourceLinks, selectedNewsLinkId, entries]);
@@ -60,11 +66,13 @@ export function ContentGenerationTab() {
     setGeneratedContent(""); 
     startGenerating(async () => {
       try {
-        const result: GenerateDerivedContentResult = await generateDerivedContentAction({
+        const inputForFlow: FlowGenInputType = {
+          profileName: profileNameState,
           newsTitle: selectedNewsItem.title,
-          newsExcerpt: selectedNewsItem.excerpt || "No excerpt provided.", // Use excerpt from source_link
+          newsExcerpt: selectedNewsItem.excerpt || "No excerpt provided.",
           contentType: selectedContentType,
-        });
+        };
+        const result: GenerateDerivedContentResult = await generateDerivedContentAction(inputForFlow);
         setGeneratedContent(result.generatedText);
         toast({ title: "Content Generated", description: `${selectedContentType} has been successfully generated.` });
       } catch (error: any) {
@@ -79,6 +87,14 @@ export function ContentGenerationTab() {
      return (
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold font-headline tracking-tight">Content Generation</h2>
+        <Card className="shadow-lg mb-6">
+            <CardHeader>
+                <div className="h-5 bg-muted rounded w-1/3 animate-pulse"></div>
+            </CardHeader>
+            <CardContent>
+                <div className="h-7 bg-muted rounded w-1/2 animate-pulse"></div>
+            </CardContent>
+        </Card>
         <Card className="shadow-lg">
           <CardHeader>
             <div className="h-6 bg-muted rounded w-1/2 animate-pulse"></div>
@@ -99,9 +115,22 @@ export function ContentGenerationTab() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold font-headline tracking-tight">Content Generation</h2>
+
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Select News Item & Content Type</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary"/> Profile Context
+          </CardTitle>
+          <CardDescription>Content will be generated with the following profile in mind:</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-lg font-semibold text-foreground">{profileNameState}</p>
+        </CardContent>
+      </Card>
+      
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle>Generate Derived Content from News</CardTitle>
           <CardDescription>Choose a news item from your encyclopedia and the type of content you want to generate.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -123,7 +152,7 @@ export function ContentGenerationTab() {
             </div>
             <div className="space-y-1">
               <Label htmlFor="content-type-select">Content Type</Label>
-              <Select value={selectedContentType} onValueChange={(value) => setSelectedContentType(value as GenerateDerivedContentInput['contentType'])}>
+              <Select value={selectedContentType} onValueChange={(value) => setSelectedContentType(value as TypesGenInput['contentType'])}>
                 <SelectTrigger id="content-type-select" className="w-full">
                   <SelectValue placeholder="Select content type..." />
                 </SelectTrigger>
