@@ -1,12 +1,12 @@
 
 "use client";
 
-import type { LegalCase, Profile, Mention, DMCALetterResult } from "@/types";
+import type { LegalCase, DMCALetterResult } from "@/types"; // Removed Profile, Mention
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CheckCircle2, Info, FileText, Mail, Loader2, ExternalLink, Archive } from "lucide-react";
-import { useState, useTransition } from "react";
+import { AlertTriangle, CheckCircle2, FileText, Mail, Loader2, ExternalLink, Archive } from "lucide-react";
+import { useState, useTransition, useEffect } from "react";
 import { generateDMCALetterAction } from "@/app/actions/legal-actions";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
@@ -17,23 +17,40 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface LegalCaseCardProps {
   legalCase: LegalCase;
-  profile: Profile; // Needed for DMCA letter
-  linkedMention?: Mention; // Optional, if case is linked to a specific mention
+  profileFullName: string; // Accept full name directly
   onUpdateCase: (updatedCase: LegalCase) => void;
 }
 
-export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase }: LegalCaseCardProps) {
+export function LegalCaseCard({ legalCase, profileFullName, onUpdateCase }: LegalCaseCardProps) {
   const [isGenerating, startGenerating] = useTransition();
   const { toast } = useToast();
+  
+  // Initialize dmcaFormData with potentially undefined linkedMention info
   const [dmcaFormData, setDmcaFormData] = useState({
-    mentionTitle: linkedMention?.title || "",
-    mentionUrl: linkedMention?.url || "",
+    mentionTitle: "", // Will be populated if a linked mention is found/passed
+    mentionUrl: "",   // Will be populated if a linked mention is found/passed
     originalWorkDescription: "",
-    fullName: profile.full_name,
-    address: "123 Main St, Anytown, USA", // Placeholder, fetch from profile if available
-    email: "contact@" + profile.full_name.toLowerCase().replace(/\s+/g, '') + ".com", // Placeholder
-    phoneNumber: "555-123-4567", // Placeholder
+    fullName: profileFullName, // Use passed prop
+    address: "123 Main St, Anytown, USA", 
+    email: "contact@" + profileFullName.toLowerCase().replace(/\s+/g, '') + ".com",
+    phoneNumber: "555-123-4567",
   });
+
+  // Effect to update DMCA form data if legalCase or profileFullName changes (e.g. initial load)
+  useEffect(() => {
+    setDmcaFormData(prev => ({
+      ...prev,
+      fullName: profileFullName,
+      email: "contact@" + profileFullName.toLowerCase().replace(/\s+/g, '') + ".com",
+      // If associated_mention_id exists and we could fetch mention details, update here.
+      // For now, we assume mentionTitle and mentionUrl would be part of legalCase.summary or a document.
+      // If not, users will need to fill them.
+      // We can prefill from legalCase.summary if it looks like a title or URL, but that's heuristic.
+      mentionTitle: legalCase.summary.substring(0,50), // Simple prefill attempt
+      mentionUrl: legalCase.documents && legalCase.documents.length > 0 ? legalCase.documents[0].url : "" // Use first doc URL if available
+    }));
+  }, [legalCase, profileFullName]);
+
 
   const handleGenerateDMCA = () => {
     startGenerating(async () => {
@@ -57,7 +74,7 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
             },
           },
         };
-        onUpdateCase(updatedCase);
+        onUpdateCase(updatedCase); // This will propagate to legal-cases-tab and then to encyclopedia context
 
         toast({
           title: "DMCA Letter Generated",
@@ -86,14 +103,14 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
   const getRiskIcon = (riskColor?: '🔴' | '🟠' | '🟢') => {
     switch (riskColor) {
       case '🔴': return <AlertTriangle className="h-5 w-5 text-red-500" />;
-      case '🟠': return <AlertTriangle className="h-5 w-5 text-orange-500" />; // Changed from Info to AlertTriangle
+      case '🟠': return <AlertTriangle className="h-5 w-5 text-orange-500" />;
       case '🟢': return <CheckCircle2 className="h-5 w-5 text-green-500" />;
       default: return <FileText className="h-5 w-5 text-gray-400" />;
     }
   };
 
   return (
-    <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
@@ -108,14 +125,14 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 flex-grow">
         <p className="text-sm text-foreground leading-relaxed">{legalCase.summary}</p>
         {legalCase.documents && legalCase.documents.length > 0 && (
           <div>
             <h4 className="font-semibold text-sm mb-1">Documents:</h4>
-            <ul className="list-disc list-inside text-sm">
-              {legalCase.documents.map(doc => (
-                <li key={doc.url}>
+            <ul className="list-disc list-inside text-sm space-y-1">
+              {legalCase.documents.map((doc, index) => (
+                <li key={doc.url + index}> {/* Add index for more unique key if names/URLs repeat */}
                   <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
                     {doc.name} <ExternalLink className="h-3 w-3" />
                   </a>
@@ -125,19 +142,25 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
           </div>
         )}
         {legalCase.auto_generated_letters && Object.keys(legalCase.auto_generated_letters).length > 0 && (
-           <div className="mt-2">
+           <div className="mt-3 pt-3 border-t">
              <h4 className="font-semibold text-sm mb-1">Generated Letters:</h4>
-             <ul className="list-disc list-inside text-sm">
+             <ul className="list-disc list-inside text-sm space-y-1">
                {Object.entries(legalCase.auto_generated_letters).map(([key, letter]) => (
                  <li key={key} className="text-muted-foreground">
-                   {letter.letter_type} generated on {new Date(letter.generated_at).toLocaleDateString()}
+                   {letter.letter_type} ({new Date(letter.generated_at).toLocaleDateString()})
                    <Dialog>
-                     <DialogTrigger asChild><Button variant="link" size="sm" className="p-1 h-auto text-xs">View</Button></DialogTrigger>
+                     <DialogTrigger asChild><Button variant="link" size="sm" className="p-1 h-auto text-xs ml-1">View</Button></DialogTrigger>
                      <DialogContent className="max-w-2xl">
                         <DialogHeader>
-                          <DialogTitle>{letter.letter_type} Letter</DialogTitle>
+                          <DialogTitle>{letter.letter_type} Letter - {new Date(letter.generated_at).toLocaleDateString()}</DialogTitle>
+                           <DialogDescription>Generated for case: {legalCase.case_id}</DialogDescription>
                         </DialogHeader>
-                        <ScrollArea className="h-[60vh]"><pre className="text-xs whitespace-pre-wrap p-2 border rounded bg-muted">{letter.content}</pre></ScrollArea>
+                        <ScrollArea className="h-[60vh] border rounded-md p-2 bg-muted/50">
+                            <pre className="text-xs whitespace-pre-wrap font-mono">{letter.content}</pre>
+                        </ScrollArea>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="outline">Close</Button></DialogClose>
+                        </DialogFooter>
                      </DialogContent>
                    </Dialog>
                  </li>
@@ -146,7 +169,7 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
            </div>
         )}
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2 justify-between">
+      <CardFooter className="flex flex-wrap gap-2 justify-between items-center pt-4">
          <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">
@@ -157,38 +180,38 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
             <DialogHeader>
               <DialogTitle>Generate DMCA Takedown Notice</DialogTitle>
               <DialogDescription>
-                Fill in the details to generate a DMCA letter for this case. Some fields are pre-filled from the profile and linked mention (if any).
+                Fill in the details to generate a DMCA letter for this case. Some fields are pre-filled.
               </DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh] p-1">
               <div className="grid gap-4 py-4 pr-2">
                 <div className="space-y-1">
-                  <Label htmlFor="dmca-mentionTitle">Infringing Content Title</Label>
-                  <Input id="dmca-mentionTitle" value={dmcaFormData.mentionTitle} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionTitle: e.target.value})} placeholder="e.g., Unauthorized copy of my photo"/>
+                  <Label htmlFor={`dmca-mentionTitle-${legalCase.id}`}>Infringing Content Title</Label>
+                  <Input id={`dmca-mentionTitle-${legalCase.id}`} value={dmcaFormData.mentionTitle} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionTitle: e.target.value})} placeholder="e.g., Unauthorized copy of my photo"/>
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="dmca-mentionUrl">Infringing Content URL *</Label>
-                  <Input id="dmca-mentionUrl" value={dmcaFormData.mentionUrl} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionUrl: e.target.value})} placeholder="https://example.com/infringing-page" required />
+                  <Label htmlFor={`dmca-mentionUrl-${legalCase.id}`}>Infringing Content URL *</Label>
+                  <Input id={`dmca-mentionUrl-${legalCase.id}`} value={dmcaFormData.mentionUrl} onChange={(e) => setDmcaFormData({...dmcaFormData, mentionUrl: e.target.value})} placeholder="https://example.com/infringing-page" required />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="dmca-originalWorkDescription">Original Work Description *</Label>
-                  <Textarea id="dmca-originalWorkDescription" value={dmcaFormData.originalWorkDescription} onChange={(e) => setDmcaFormData({...dmcaFormData, originalWorkDescription: e.target.value})} placeholder="Detailed description of your original copyrighted work..." required />
+                  <Label htmlFor={`dmca-originalWorkDescription-${legalCase.id}`}>Original Work Description *</Label>
+                  <Textarea id={`dmca-originalWorkDescription-${legalCase.id}`} value={dmcaFormData.originalWorkDescription} onChange={(e) => setDmcaFormData({...dmcaFormData, originalWorkDescription: e.target.value})} placeholder="Detailed description of your original copyrighted work..." required rows={3}/>
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="dmca-fullName">Copyright Holder Name</Label>
-                  <Input id="dmca-fullName" value={dmcaFormData.fullName} onChange={(e) => setDmcaFormData({...dmcaFormData, fullName: e.target.value})} />
+                  <Label htmlFor={`dmca-fullName-${legalCase.id}`}>Copyright Holder Name</Label>
+                  <Input id={`dmca-fullName-${legalCase.id}`} value={dmcaFormData.fullName} onChange={(e) => setDmcaFormData({...dmcaFormData, fullName: e.target.value})} />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="dmca-address">Address</Label>
-                  <Input id="dmca-address" value={dmcaFormData.address} onChange={(e) => setDmcaFormData({...dmcaFormData, address: e.target.value})} />
+                  <Label htmlFor={`dmca-address-${legalCase.id}`}>Address</Label>
+                  <Input id={`dmca-address-${legalCase.id}`} value={dmcaFormData.address} onChange={(e) => setDmcaFormData({...dmcaFormData, address: e.target.value})} />
                 </div>
                  <div className="space-y-1">
-                  <Label htmlFor="dmca-email">Email</Label>
-                  <Input id="dmca-email" type="email" value={dmcaFormData.email} onChange={(e) => setDmcaFormData({...dmcaFormData, email: e.target.value})} />
+                  <Label htmlFor={`dmca-email-${legalCase.id}`}>Email</Label>
+                  <Input id={`dmca-email-${legalCase.id}`} type="email" value={dmcaFormData.email} onChange={(e) => setDmcaFormData({...dmcaFormData, email: e.target.value})} />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="dmca-phoneNumber">Phone Number</Label>
-                  <Input id="dmca-phoneNumber" value={dmcaFormData.phoneNumber} onChange={(e) => setDmcaFormData({...dmcaFormData, phoneNumber: e.target.value})} />
+                  <Label htmlFor={`dmca-phoneNumber-${legalCase.id}`}>Phone Number</Label>
+                  <Input id={`dmca-phoneNumber-${legalCase.id}`} value={dmcaFormData.phoneNumber} onChange={(e) => setDmcaFormData({...dmcaFormData, phoneNumber: e.target.value})} />
                 </div>
               </div>
             </ScrollArea>
@@ -201,7 +224,7 @@ export function LegalCaseCard({ legalCase, profile, linkedMention, onUpdateCase 
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <Button variant="outline" size="sm" disabled>
+        <Button variant="outline" size="sm" disabled> {/* Archive evidence is future work */}
           <Archive className="mr-2 h-4 w-4" /> Archive Evidence
         </Button>
       </CardFooter>

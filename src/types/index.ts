@@ -29,8 +29,18 @@ export interface EncyclopediaSourceLink {
     notes?: string;
   };
   // This helps determine how to treat this link if displayed as a "Mention"
-  // It can be inferred from the parent EncyclopediaEntry's type, or overridden here.
   source_type_override?: Mention['source_type']; 
+
+  // Optional fields to guide transformation into a LegalCase
+  legal_case_status?: LegalCase['case_status'];
+  legal_court_name?: string;
+  legal_case_id_override?: string;
+  legal_filing_date?: string | Date; // Can be a string for parsing or a Date object
+  legal_documents?: Array<{ name: string; url: string }>; // For multiple documents related to one source link
+  legal_removal_status?: LegalCase['removal_status'];
+  legal_last_action_date?: string | Date;
+  legal_associated_mention_id?: string;
+  legal_auto_generated_letters?: LegalCase['auto_generated_letters']; // To store letters if generated
 }
 
 export interface EncyclopediaEntry {
@@ -68,19 +78,21 @@ export interface Mention {
 
 
 export interface LegalCase {
-  id: string;
+  id: string; // Will be the EncyclopediaSourceLink.id
   profileId: string;
-  case_id: string;
+  case_id: string; // User-defined or derived case identifier
   court: string;
   case_status: 'Active' | 'Settled' | 'Potential' | 'Dismissed' | 'Appealed';
-  risk_color?: '🔴' | '🟠' | '🟢'; // Updated from 🟡
+  risk_color?: '🔴' | '🟠' | '🟢'; 
   filing_date: Date;
   summary: string;
-  documents?: Array<{ name: string; url: string }>;
+  documents?: Array<{ name: string; url: string }>; // Could be primary link or list
   auto_generated_letters?: Record<string, { letter_type: 'DMCA' | 'GDPR' | 'Other', content: string, generated_at: Date }>;
   removal_status?: 'Pending' | 'Successful' | 'Failed' | 'Not Applicable';
   last_action_date?: Date;
   associated_mention_id?: string; 
+  originalEntryId: string; // Link back to the EncyclopediaEntry
+  originalLinkId: string;  // Link back to the EncyclopediaSourceLink
 }
 
 
@@ -109,4 +121,3 @@ export interface GenerateDerivedContentInput {
 export interface GenerateDerivedContentResult {
   generatedText: string;
 }
-

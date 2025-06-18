@@ -1,7 +1,7 @@
 
 import type { EncyclopediaEntry } from "@/types";
 
-export const LOCAL_STORAGE_KEY_ENCYCLOPEDIA = "encyclopediaEntries_v10_locations";
+export const LOCAL_STORAGE_KEY_ENCYCLOPEDIA = "encyclopediaEntries_v11_legal_integration";
 
 // Updated Mock Encyclopedia Entries - Category-based structure
 export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
@@ -161,10 +161,40 @@ export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     id: "enc-legal-public",
     profileId: "profile1",
     section_title: "Public Legal Mentions & Filings - Kunwer Sachdev",
-    content_markdown: "Collection of publicly accessible legal documents, case mentions, or official filings related to Kunwer Sachdev (distinct from the 'Legal Cases' tab which is for active case management).",
+    content_markdown: "Collection of publicly accessible legal documents, case mentions, or official filings related to Kunwer Sachdev. This section serves as the source for the 'Legal Cases' tab.",
     source_verified: false,
     disputed_flag: false,
-    source_links: [],
+    source_links: [
+      {
+        id: "legal-link-1",
+        title: "KS-IP-2023-007 - Tech Patent Tribunal",
+        url: "https://example.com/legal/patent-dispute-007",
+        excerpt: "Potential intellectual property dispute regarding a new energy storage patent. Preliminary discussions underway.",
+        timestamp: new Date("2023-11-05"),
+        platform: "Tech Patent Tribunal", // Can be used as court name
+        risk_color: "🟠",
+        legal_case_status: "Potential",
+        legal_case_id_override: "KS-IP-2023-007",
+        legal_filing_date: new Date("2023-11-05"),
+        legal_last_action_date: new Date("2024-02-15"),
+        legal_documents: [{ name: "Patent Application Preview.pdf", url: "#doc1" }, { name: "Initial Correspondence.pdf", url: "#doc2" }],
+      },
+      {
+        id: "legal-link-2",
+        title: "DMCA-KS2024-002 - Infringement Claim",
+        url: "https://example.com/dmca/ks2024-002",
+        excerpt: "DMCA takedown notice sent for unauthorized use of Kunwer Sachdev's interview footage on a third-party video platform. Successfully removed.",
+        timestamp: new Date("2024-01-20"),
+        platform: "DMCA System", // Can be used as court name
+        risk_color: "🟢",
+        legal_case_status: "Settled",
+        legal_case_id_override: "DMCA-KS2024-002",
+        legal_filing_date: new Date("2024-01-20"),
+        legal_removal_status: "Successful",
+        legal_last_action_date: new Date("2024-02-05"),
+        legal_associated_mention_id: "mention_video_infringement", 
+      }
+    ],
   },
   {
     id: "enc-sample-photos",
