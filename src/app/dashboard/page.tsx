@@ -11,7 +11,7 @@ import { AnalyticsTab } from "@/components/dashboard/analytics-tab";
 import { ContentGenerationTab } from "@/components/dashboard/content-generation-tab";
 import { SettingsTab } from "@/components/dashboard/settings-tab";
 import { PhotoGalleryTab } from "@/components/dashboard/photo-gallery-tab";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // Added useRef
 import { useRouter } from "next/navigation";
 import type { EncyclopediaEntry, EncyclopediaSourceLink } from "@/types";
 import { EncyclopediaContext } from "@/contexts/encyclopedia-context";
@@ -26,16 +26,21 @@ const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("overview"); // Default to overview
+  const [activeTab, setActiveTab] = useState("overview"); 
   const [encyclopediaEntries, setEncyclopediaEntries] = useState<EncyclopediaEntry[]>([]);
   const [isEncyclopediaLoading, setIsEncyclopediaLoading] = useState(true);
+
+  // Ref to hold the current activeTab value for use in useEffect without causing re-runs
+  const activeTabRef = useRef(activeTab);
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
 
   useEffect(() => {
     const storedEntries = localStorage.getItem(LOCAL_STORAGE_KEY_ENCYCLOPEDIA);
     if (storedEntries) {
       try {
         const parsedEntries = JSON.parse(storedEntries);
-        // Ensure timestamps are Date objects
         const entriesWithDates = parsedEntries.map((entry: EncyclopediaEntry) => ({
           ...entry,
           source_links: entry.source_links?.map(link => ({
@@ -73,44 +78,39 @@ export default function DashboardPage() {
   }, [encyclopediaEntries, isEncyclopediaLoading]);
 
 
-  // Effect to synchronize activeTab with URL hash
+  // Effect for initializing tab from URL and handling external hash changes
   useEffect(() => {
-    const handleHashChange = () => {
+    const handleHash = () => {
       const currentUrlHash = window.location.hash.substring(1);
-
       if (currentUrlHash && validTabs.includes(currentUrlHash)) {
-        // If there's a valid hash, and it's different from the current activeTab, update activeTab.
-        if (activeTab !== currentUrlHash) {
+        // If hash is valid and different from current activeTab (via ref), update activeTab
+        if (activeTabRef.current !== currentUrlHash) {
           setActiveTab(currentUrlHash);
         }
       } else if (window.location.pathname === '/dashboard') {
-        // If on the dashboard page and the hash is missing or invalid:
-        // 1. Set activeTab to "overview" if it's not already.
-        if (activeTab !== "overview") {
+        // If hash is invalid or missing on dashboard, default to overview
+        if (activeTabRef.current !== "overview") {
           setActiveTab("overview");
         }
-        // 2. Ensure the URL hash reflects "overview" if it's not already correct.
-        if (currentUrlHash !== "overview") {
+        // Ensure URL hash reflects "overview" if it's not already correct
+        if (window.location.hash !== "#overview") {
           router.replace('/dashboard#overview', { scroll: false });
         }
       }
     };
 
-    // Sync on initial mount
-    handleHashChange();
+    handleHash(); // Sync on initial mount
 
-    // Listen for hash changes (e.g., back/forward button, direct URL manipulation)
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', handleHash);
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('hashchange', handleHash);
     };
-    // This effect depends on activeTab (to compare against hash) and router (to call replace).
-  }, [activeTab, router]);
+  }, [router]); // Only depends on router (for .replace) and validTabs (which is stable outside)
 
-  // Handler for when a tab is clicked in the TabsList
+
   const handleTabChange = (newTabValue: string) => {
-    if (activeTab !== newTabValue && validTabs.includes(newTabValue)) {
-      setActiveTab(newTabValue); // Update internal state
+    if (validTabs.includes(newTabValue) && activeTab !== newTabValue) {
+      setActiveTab(newTabValue); // Update internal React state
       router.push(`/dashboard#${newTabValue}`, { scroll: false }); // Update URL hash
     }
   };
@@ -131,8 +131,8 @@ export default function DashboardPage() {
         entry.id === entryId
           ? {
               ...entry,
-              source_links: (entry.source_links || []).map(link =>
-                link.id === linkId ? { ...link, ...updatedLinkData } : link
+              source_links: (entry.source_links || []).map(l =>
+                l.id === linkId ? { ...l, ...updatedLinkData } : l
               ),
             }
           : entry
