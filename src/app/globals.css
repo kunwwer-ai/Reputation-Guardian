@@ -48,11 +48,12 @@ body {
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 210 67% 47%;
     
-    --chart-1: 210 67% 47%;
-    --chart-2: 180 53% 47%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Chart colors */
+    --chart-1: 210 67% 47%; /* Primary Blue */
+    --chart-2: 180 53% 47%; /* Accent Teal/Cyan */
+    --chart-3: 30 80% 55%;  /* Vibrant Orange */
+    --chart-4: 280 65% 60%; /* Purple */
+    --chart-5: 340 75% 55%; /* Pink/Red */
   }
 
   .dark {
@@ -94,11 +95,12 @@ body {
     --sidebar-border: 220 15% 28%;
     --sidebar-ring: 210 67% 52%;
 
+    /* Chart colors for dark mode */
     --chart-1: 210 67% 52%;
     --chart-2: 180 53% 52%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --chart-3: 30 80% 60%; 
+    --chart-4: 280 65% 65%;
+    --chart-5: 340 75% 60%;
   }
 }
 

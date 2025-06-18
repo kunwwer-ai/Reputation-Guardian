@@ -110,7 +110,7 @@ export function AnalyticsTab() {
   const chartConfig = {
     total: {
       label: "Items Added",
-      color: "hsl(var(--primary))",
+      color: "hsl(var(--chart-1))", // Using chart-1 for consistency
     },
   };
 
