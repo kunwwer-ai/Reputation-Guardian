@@ -26,7 +26,7 @@ const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("overview"); // Default to overview
   const [encyclopediaEntries, setEncyclopediaEntries] = useState<EncyclopediaEntry[]>([]);
   const [isEncyclopediaLoading, setIsEncyclopediaLoading] = useState(true);
 
@@ -73,31 +73,45 @@ export default function DashboardPage() {
   }, [encyclopediaEntries, isEncyclopediaLoading]);
 
 
+  // Effect to synchronize activeTab with URL hash
   useEffect(() => {
-    const syncTabWithHash = () => {
+    const handleHashChange = () => {
       const currentUrlHash = window.location.hash.substring(1);
+
       if (currentUrlHash && validTabs.includes(currentUrlHash)) {
+        // If there's a valid hash, and it's different from the current activeTab, update activeTab.
         if (activeTab !== currentUrlHash) {
           setActiveTab(currentUrlHash);
         }
-      } else {
-        if (activeTab !== "overview" && window.location.pathname === '/dashboard') {
+      } else if (window.location.pathname === '/dashboard') {
+        // If on the dashboard page and the hash is missing or invalid:
+        // 1. Set activeTab to "overview" if it's not already.
+        if (activeTab !== "overview") {
           setActiveTab("overview");
+        }
+        // 2. Ensure the URL hash reflects "overview" if it's not already correct.
+        if (currentUrlHash !== "overview") {
           router.replace('/dashboard#overview', { scroll: false });
         }
       }
     };
-    syncTabWithHash(); 
-    window.addEventListener('hashchange', syncTabWithHash, false);
-    return () => {
-      window.removeEventListener('hashchange', syncTabWithHash, false);
-    };
-  }, [router, activeTab]);
 
-  const handleTabChange = (value: string) => {
-     if (activeTab !== value) { 
-      setActiveTab(value); 
-      router.push(`/dashboard#${value}`, { scroll: false }); 
+    // Sync on initial mount
+    handleHashChange();
+
+    // Listen for hash changes (e.g., back/forward button, direct URL manipulation)
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+    // This effect depends on activeTab (to compare against hash) and router (to call replace).
+  }, [activeTab, router]);
+
+  // Handler for when a tab is clicked in the TabsList
+  const handleTabChange = (newTabValue: string) => {
+    if (activeTab !== newTabValue && validTabs.includes(newTabValue)) {
+      setActiveTab(newTabValue); // Update internal state
+      router.push(`/dashboard#${newTabValue}`, { scroll: false }); // Update URL hash
     }
   };
 
@@ -161,7 +175,7 @@ export default function DashboardPage() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
-          <div className="flex-grow overflow-y-auto pb-10 mt-6"> {/* Added mt-6 here */}
+          <div className="flex-grow overflow-y-auto pb-10 mt-6">
             <TabsContent value="overview" className="mt-0">
               <OverviewTab />
             </TabsContent>
