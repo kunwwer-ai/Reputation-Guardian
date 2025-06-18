@@ -52,7 +52,7 @@ export function NewsFeedTab() {
     if (newsSection && newsSection.source_links) {
       return newsSection.source_links.map(link => 
         transformSourceLinkToMention(link, newsSection.id, newsSection.section_title)
-      );
+      ).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Sort newest first
     }
     return [];
   }, [entries]);
@@ -67,7 +67,7 @@ export function NewsFeedTab() {
 
   const handleUpdateNewsItem = (updatedMention: Mention) => {
     if (updatedMention.originalEntryId && updatedMention.originalLinkId) {
-      const { originalEntryId, originalLinkId, ...linkDataToUpdate } = updatedMention;
+      const { originalEntryId, originalLinkId, profileId, source_type, ...linkDataToUpdate } = updatedMention;
       
       // Construct the update object for EncyclopediaSourceLink
       const sourceLinkUpdate: Partial<EncyclopediaSourceLink> = {
@@ -88,6 +88,9 @@ export function NewsFeedTab() {
   if (isLoading) {
     return (
       <div className="space-y-6">
+        <div className="flex justify-between items-center">
+           <div className="h-8 bg-muted rounded w-40 animate-pulse"></div>
+        </div>
         {[...Array(2)].map((_, i) => (
           <Card key={i} className="w-full shadow-lg">
             <CardHeader>
@@ -115,14 +118,19 @@ export function NewsFeedTab() {
       </div>
       
       {newsItems.length === 0 ? (
-        <p>No news items found in the encyclopedia. Add links to the "News Articles" collection in the Encyclopedia tab.</p>
+         <Card className="shadow-lg">
+          <CardContent className="pt-6">
+            <p className="text-muted-foreground">No news items found. Add links to the "News Articles" collection in the Encyclopedia tab.</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           {newsItems.map(newsItem => (
-            <MentionCard key={newsItem.id} mention={newsItem} onUpdateMention={handleUpdateNewsItem} />
+            <MentionCard key={`${newsItem.originalEntryId}-${newsItem.id}`} mention={newsItem} onUpdateMention={handleUpdateNewsItem} />
           ))}
         </div>
       )}
     </div>
   );
 }
+
