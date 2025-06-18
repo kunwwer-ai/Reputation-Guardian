@@ -19,7 +19,7 @@ import { initialMockEncyclopediaEntries, LOCAL_STORAGE_KEY_ENCYCLOPEDIA } from "
 
 
 function RiskAssessmentToolPlaceholder() {
-  return <div className="p-4 border rounded-lg bg-card shadow"><h3 className="text-xl font-semibold">Risk Assessment Tool</h3><p className="text-muted-foreground">AI-powered scanning tool to analyze online mentions and legal cases, and assess their risk level. (Coming Soon)</p></div>;
+  return <div className="p-4 border rounded-lg bg-card shadow"><h3 className="text-xl font-semibold">Risk Assessment Tool</h3><p className="text-muted-foreground">AI-powered scanning tool to analyze online mentions and legal cases, and assesses their risk level. (Coming Soon)</p></div>;
 }
 
 const validTabs = ["overview", "mentions", "legal-cases", "encyclopedia", "news-feed", "analytics", "content-generation", "risk-assessment", "photo-gallery", "settings"];
@@ -148,7 +148,7 @@ export default function DashboardPage() {
       }}>
       <div className="flex flex-col h-full">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-grow flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 xl:grid-cols-10 gap-1 mb-6 shadow-sm bg-background/90 p-1">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 xl:grid-cols-10 gap-1 shadow-sm bg-background/90 p-1">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="mentions">Mentions</TabsTrigger>
             <TabsTrigger value="legal-cases">Legal Cases</TabsTrigger>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
-          <div className="flex-grow overflow-y-auto pb-10">
+          <div className="flex-grow overflow-y-auto pb-10 mt-6"> {/* Added mt-6 here */}
             <TabsContent value="overview" className="mt-0">
               <OverviewTab />
             </TabsContent>
