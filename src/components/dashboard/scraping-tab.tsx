@@ -13,6 +13,7 @@ import type { ScrapeWebsiteOutput } from "@/ai/flows/scrape-website-flow";
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { EncyclopediaSourceLink } from "@/types";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export function ScrapingTab() {
   const [urlToScrape, setUrlToScrape] = useState("");
@@ -104,10 +105,25 @@ export function ScrapingTab() {
           </div>
         </CardContent>
         <CardFooter>
-            <Button onClick={handleScrape} disabled={isScraping || !urlToScrape.trim()}>
-                {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                <span className="ml-2">Scrape & Analyze</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                  <Button disabled={isScraping || !urlToScrape.trim()}>
+                      {isScraping ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                      <span>Scrape & Analyze...</span>
+                  </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={handleScrape}>
+                      Analyze with AI (Default)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                      Use Social Media API (Coming Soon)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                      Use News API (Coming Soon)
+                  </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
         </CardFooter>
       </Card>
 
