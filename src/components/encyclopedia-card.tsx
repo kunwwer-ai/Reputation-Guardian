@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2 } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
@@ -195,7 +196,7 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
             <DialogHeader>
               <DialogTitle>Add New Link to "{currentEntry.section_title}"</DialogTitle>
               <DialogDescription>
-                Enter a URL and click the magic wand to scrape its details, or fill them in manually.
+                Enter a URL and choose a scraping option, or fill in the details manually.
               </DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh] p-1">
@@ -210,16 +211,32 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
                       placeholder="https://www.example.com/some-article" 
                       className="flex-grow"
                     />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={handleScrapeUrl} 
-                      disabled={isScraping || !newLink.url}
-                      aria-label="Scrape URL for details"
-                      title="Scrape URL for details"
-                    >
-                      {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          disabled={isScraping || !newLink.url}
+                          aria-label="Choose a scraping method"
+                          title="Choose a scraping method"
+                        >
+                          {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Scraping Options</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleScrapeUrl}>
+                          Analyze with AI (Default)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem disabled>
+                          Scrape from Social Media API (Coming Soon)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem disabled>
+                          Scrape from News API (Coming Soon)
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -284,3 +301,5 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     </Card>
   );
 }
+
+    
