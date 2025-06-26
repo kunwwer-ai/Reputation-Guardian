@@ -11,10 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2 } from "lucide-react";
+import { useState, useEffect, useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
+import { scrapeUrlAction } from "@/app/actions/scraping-actions";
 
 interface EncyclopediaCardProps {
   entry: EncyclopediaEntry;
@@ -33,6 +34,8 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
   const [editableTitle, setEditableTitle] = useState(entry.section_title);
   const [editableContent, setEditableContent] = useState(entry.content_markdown);
 
+  const [isScraping, startScraping] = useTransition();
+
 
   const handleVerificationToggle = (verified: boolean) => {
     const updatedEntry = { ...currentEntry, source_verified: verified };
@@ -46,6 +49,34 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     setCurrentEntry(updatedEntry);
     onUpdateEntry(updatedEntry);
     toast({ title: `Content ${disputed ? 'Disputed' : 'Undisputed'}`, description: `Section "${entry.section_title}" has been updated.` });
+  };
+  
+  const handleScrapeUrl = () => {
+    if (!newLink.url?.trim()) {
+      toast({ variant: "destructive", title: "Error", description: "Please enter a URL to scrape." });
+      return;
+    }
+    try {
+      new URL(newLink.url);
+    } catch (_) {
+      toast({ variant: "destructive", title: "Error", description: "Invalid URL format." });
+      return;
+    }
+
+    startScraping(async () => {
+      try {
+        const result = await scrapeUrlAction(newLink.url!);
+        setNewLink(prev => ({
+          ...prev,
+          title: result.title,
+          excerpt: result.summary,
+          platform: result.platform
+        }));
+        toast({ title: "Content Scraped", description: "The title, excerpt, and platform have been filled in." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Scraping Failed", description: error.message || "An unknown error occurred." });
+      }
+    });
   };
 
   const handleAddNewLink = () => {
@@ -164,32 +195,50 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
             <DialogHeader>
               <DialogTitle>Add New Link to "{currentEntry.section_title}"</DialogTitle>
               <DialogDescription>
-                Enter the details for the link you want to add to this section.
+                Enter a URL and click the magic wand to scrape its details, or fill them in manually.
               </DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh] p-1">
               <div className="grid gap-4 py-4 pr-4">
                 <div className="space-y-1">
-                  <Label htmlFor="link-title">Link Title *</Label>
-                  <Input id="link-title" value={newLink.title} onChange={(e) => setNewLink({...newLink, title: e.target.value})} placeholder="e.g., Google Search Result for..." />
+                  <Label htmlFor={`link-url-${currentEntry.id}`}>Link URL *</Label>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      id={`link-url-${currentEntry.id}`}
+                      value={newLink.url} 
+                      onChange={(e) => setNewLink({ ...newLink, url: e.target.value })} 
+                      placeholder="https://www.example.com/some-article" 
+                      className="flex-grow"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={handleScrapeUrl} 
+                      disabled={isScraping || !newLink.url}
+                      aria-label="Scrape URL for details"
+                      title="Scrape URL for details"
+                    >
+                      {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="link-url">Link URL *</Label>
-                  <Input id="link-url" value={newLink.url} onChange={(e) => setNewLink({...newLink, url: e.target.value})} placeholder="https://www.example.com/search-result" />
+                  <Label htmlFor={`link-title-${currentEntry.id}`}>Link Title *</Label>
+                  <Input id={`link-title-${currentEntry.id}`} value={newLink.title} onChange={(e) => setNewLink({...newLink, title: e.target.value})} placeholder="e.g., Google Search Result for..." />
                 </div>
                  <div className="space-y-1">
-                  <Label htmlFor="link-excerpt">Excerpt / Description</Label>
-                  <Textarea id="link-excerpt" value={newLink.excerpt} onChange={(e) => setNewLink({...newLink, excerpt: e.target.value})} placeholder="Short summary or key text from the link..." rows={3} />
+                  <Label htmlFor={`link-excerpt-${currentEntry.id}`}>Excerpt / Description</Label>
+                  <Textarea id={`link-excerpt-${currentEntry.id}`} value={newLink.excerpt} onChange={(e) => setNewLink({...newLink, excerpt: e.target.value})} placeholder="Short summary or key text from the link..." rows={3} />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="link-platform">Platform (Optional)</Label>
-                  <Input id="link-platform" value={newLink.platform} onChange={(e) => setNewLink({...newLink, platform: e.target.value})} placeholder="e.g., Forbes, YouTube Channel Name" />
+                  <Label htmlFor={`link-platform-${currentEntry.id}`}>Platform</Label>
+                  <Input id={`link-platform-${currentEntry.id}`} value={newLink.platform} onChange={(e) => setNewLink({...newLink, platform: e.target.value})} placeholder="e.g., Forbes, YouTube Channel Name" />
                 </div>
               </div>
             </ScrollArea>
             <DialogFooter>
               <DialogClose asChild><Button variant="outline" onClick={() => { setNewLink({ title: "", url: "", excerpt: "", platform: "" });}}>Cancel</Button></DialogClose>
-              <Button onClick={handleAddNewLink}>Save Link</Button>
+              <Button onClick={handleAddNewLink} disabled={isScraping}>Save Link</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
