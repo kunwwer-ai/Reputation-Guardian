@@ -12,11 +12,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2, Search } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2, Search, Calendar as CalendarIcon } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
 import { scrapeUrlAction } from "@/app/actions/scraping-actions";
+import { format } from "date-fns";
+import { type DateRange } from "react-day-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 interface EncyclopediaCardProps {
   entry: EncyclopediaEntry;
@@ -39,6 +44,7 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
 
   const [isBulkSearchDialogOpen, setIsBulkSearchDialogOpen] = useState(false);
   const [bulkSearchTerms, setBulkSearchTerms] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
 
   const handleVerificationToggle = (verified: boolean) => {
@@ -128,9 +134,16 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
   };
   
   const handleRunBulkSearch = () => {
+    let description = "This would search the web for your terms. This feature is not yet fully implemented.";
+    if (dateRange?.from) {
+        const from = format(dateRange.from, "PPP");
+        const to = dateRange.to ? format(dateRange.to, "PPP") : 'now';
+        description += ` Date range: ${from} to ${to}.`;
+    }
+
     toast({
         title: "Search Started (Simulation)",
-        description: "This would search the web for your terms. This feature is not yet fully implemented.",
+        description: description,
     });
     setIsBulkSearchDialogOpen(false);
   };
@@ -212,22 +225,63 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
                         <Search className="mr-2 h-4 w-4" /> Bulk Search
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
                         <DialogTitle>Bulk Web Search</DialogTitle>
                         <DialogDescription>
-                            Enter search terms (one per line) to search across the web. This is a conceptual feature for now.
+                            Enter search terms and select a date range to search across the web. This is a conceptual feature for now.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <Label htmlFor="bulk-search-terms">Search Terms</Label>
-                        <Textarea
-                            id="bulk-search-terms"
-                            value={bulkSearchTerms}
-                            onChange={(e) => setBulkSearchTerms(e.target.value)}
-                            rows={5}
-                            placeholder="Kunwer Sachdev&#10;Kunwar Sachdeva&#10;..."
-                        />
+                        <div className="grid gap-2">
+                            <Label htmlFor="date-range">Date Range</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        id="date-range"
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !dateRange && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {dateRange?.from ? (
+                                            dateRange.to ? (
+                                                <>
+                                                    {format(dateRange.from, "LLL dd, y")} -{" "}
+                                                    {format(dateRange.to, "LLL dd, y")}
+                                                </>
+                                            ) : (
+                                                format(dateRange.from, "LLL dd, y")
+                                            )
+                                        ) : (
+                                            <span>Pick a date range</span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        initialFocus
+                                        mode="range"
+                                        defaultMonth={dateRange?.from}
+                                        selected={dateRange}
+                                        onSelect={setDateRange}
+                                        numberOfMonths={2}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="bulk-search-terms">Search Terms</Label>
+                            <Textarea
+                                id="bulk-search-terms"
+                                value={bulkSearchTerms}
+                                onChange={(e) => setBulkSearchTerms(e.target.value)}
+                                rows={5}
+                                placeholder="Kunwer Sachdev&#10;Kunwar Sachdeva&#10;..."
+                            />
+                        </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
