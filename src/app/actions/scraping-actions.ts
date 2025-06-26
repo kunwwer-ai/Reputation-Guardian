@@ -5,21 +5,19 @@ import type { ScrapeWebsiteOutput } from "@/ai/flows/scrape-website-flow";
 
 export async function scrapeUrlAction(params: { url: string; cssSelector?: string }): Promise<ScrapeWebsiteOutput> {
   const { url, cssSelector } = params;
-  const apiKey = process.env.SCRAPING_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("Scraping API key is not configured. Please set SCRAPING_API_KEY in your environment variables.");
-  }
-
-  // Using a third-party scraping service to avoid IP blocks and handle JavaScript rendering.
-  // The service used here is a common example (ScraperAPI), but can be swapped with any other service.
-  const scraperApiUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(url)}`;
 
   try {
-    const response = await fetch(scraperApiUrl);
+    // Using a direct fetch with a realistic User-Agent.
+    // For production-grade scraping that needs to handle blocks, proxies, or JavaScript rendering,
+    // this is where you would integrate a service like BrightData, ScraperAPI, etc.
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch URL via scraping service: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
     }
 
     const htmlContent = await response.text();
@@ -31,8 +29,8 @@ export async function scrapeUrlAction(params: { url: string; cssSelector?: strin
   } catch (error: any) {
     console.error("Error scraping URL:", error);
     // Provide a more user-friendly error message
-    if (error.message.includes('fetch') || error.name === 'TypeError') {
-      throw new Error("Could not retrieve content from the URL. The scraping service may be down or the target site is heavily protected.");
+    if (error.message.includes('fetch') || error.name === 'TypeError' || error.message.includes('Invalid URL')) {
+      throw new Error("Could not retrieve content from the URL. Please check if the URL is correct and accessible.");
     }
     throw new Error("Failed to scrape and analyze the URL. Please try again.");
   }
