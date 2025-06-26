@@ -16,6 +16,7 @@ import type { EncyclopediaSourceLink } from "@/types";
 
 export function ScrapingTab() {
   const [urlToScrape, setUrlToScrape] = useState("");
+  const [cssSelector, setCssSelector] = useState("");
   const [scrapedData, setScrapedData] = useState<ScrapeWebsiteOutput | null>(null);
   const [isScraping, startScraping] = useTransition();
   const { toast } = useToast();
@@ -37,7 +38,7 @@ export function ScrapingTab() {
     setScrapedData(null); // Clear previous results
     startScraping(async () => {
       try {
-        const result = await scrapeUrlAction(urlToScrape);
+        const result = await scrapeUrlAction({ url: urlToScrape, cssSelector: cssSelector.trim() || undefined });
         setScrapedData(result);
         toast({ title: "Scraping Complete", description: "Web content has been analyzed." });
       } catch (error: any) {
@@ -68,6 +69,7 @@ export function ScrapingTab() {
     // Clear fields after adding
     setScrapedData(null);
     setUrlToScrape("");
+    setCssSelector("");
     setSelectedCollectionId(undefined);
   };
 
@@ -78,25 +80,35 @@ export function ScrapingTab() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Scrape a URL</CardTitle>
-          <CardDescription>Enter a URL to fetch and analyze its content using AI.</CardDescription>
+          <CardDescription>Enter a URL to fetch and analyze its content using AI. Optionally, provide a CSS selector to target a specific part of the page.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="url-input">Website URL</Label>
-            <div className="flex gap-2">
-              <Input
-                id="url-input"
-                value={urlToScrape}
-                onChange={(e) => setUrlToScrape(e.target.value)}
-                placeholder="https://www.example.com/article"
-              />
-              <Button onClick={handleScrape} disabled={isScraping || !urlToScrape.trim()}>
-                {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                <span className="ml-2">Scrape & Analyze</span>
-              </Button>
-            </div>
+            <Input
+              id="url-input"
+              value={urlToScrape}
+              onChange={(e) => setUrlToScrape(e.target.value)}
+              placeholder="https://www.example.com/article"
+            />
+          </div>
+           <div className="space-y-2">
+            <Label htmlFor="selector-input">CSS Selector (Optional)</Label>
+            <Input
+              id="selector-input"
+              value={cssSelector}
+              onChange={(e) => setCssSelector(e.target.value)}
+              placeholder="e.g., #content, .article-body"
+            />
+             <p className="text-xs text-muted-foreground">Provide a selector to focus the analysis on a specific part of the page.</p>
           </div>
         </CardContent>
+        <CardFooter>
+            <Button onClick={handleScrape} disabled={isScraping || !urlToScrape.trim()}>
+                {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                <span className="ml-2">Scrape & Analyze</span>
+            </Button>
+        </CardFooter>
       </Card>
 
       {isScraping && (

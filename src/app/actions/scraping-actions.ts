@@ -3,7 +3,8 @@
 import { scrapeAndAnalyzeWebsite as scrapeAndAnalyzeWebsiteFlow } from "@/ai/flows/scrape-website-flow";
 import type { ScrapeWebsiteOutput } from "@/ai/flows/scrape-website-flow";
 
-export async function scrapeUrlAction(url: string): Promise<ScrapeWebsiteOutput> {
+export async function scrapeUrlAction(params: { url: string; cssSelector?: string }): Promise<ScrapeWebsiteOutput> {
+  const { url, cssSelector } = params;
   try {
     const response = await fetch(url, {
       headers: {
@@ -19,8 +20,8 @@ export async function scrapeUrlAction(url: string): Promise<ScrapeWebsiteOutput>
 
     const htmlContent = await response.text();
 
-    // Pass the raw HTML to our flow, which will handle cleaning it up.
-    const result = await scrapeAndAnalyzeWebsiteFlow({ htmlContent });
+    // Pass the raw HTML and optional selector to our flow.
+    const result = await scrapeAndAnalyzeWebsiteFlow({ htmlContent, cssSelector });
     return result;
 
   } catch (error: any) {
