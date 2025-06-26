@@ -9,7 +9,7 @@ export const initialMockEncyclopediaEntries: EncyclopediaEntry[] = [
     id: "enc-all-search", 
     profileId: "profile1",
     section_title: "General Web Search - Kunwer Sachdev & Variations",
-    content_markdown: "Collect links from various search engines (Google, Bing, DuckDuckGo, etc.) for 'Kunwer Sachdev' and its common spelling variations like 'Kunwar Sachdeva', 'Kuwer Sachdeva', 'Kumar Sachdeva'. This section is for a broad overview of search presence before categorizing.",
+    content_markdown: "Collect links from various search engines (Google, Bing, DuckDuckGo, etc.) for 'Kunwer Sachdev' and its common spelling variations like 'Kunwar Sachdeva', 'Kunwwer Sachdev', 'Kuwar Sachdeva', 'Kumar Sachdeva'. This section is for a broad overview of search presence before categorizing.",
     source_verified: false,
     disputed_flag: false,
     source_links: [

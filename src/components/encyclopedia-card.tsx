@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2 } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2, Search } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
@@ -36,6 +36,9 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
   const [editableContent, setEditableContent] = useState(entry.content_markdown);
 
   const [isScraping, startScraping] = useTransition();
+
+  const [isBulkSearchDialogOpen, setIsBulkSearchDialogOpen] = useState(false);
+  const [bulkSearchTerms, setBulkSearchTerms] = useState("");
 
 
   const handleVerificationToggle = (verified: boolean) => {
@@ -123,11 +126,27 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     toast({ title: "Section Updated", description: `"${editableTitle}" has been saved.`});
     setIsEditSectionDialogOpen(false);
   };
+  
+  const handleRunBulkSearch = () => {
+    toast({
+        title: "Search Started (Simulation)",
+        description: "This would search the web for your terms. This feature is not yet fully implemented.",
+    });
+    setIsBulkSearchDialogOpen(false);
+  };
 
   useEffect(() => {
     setCurrentEntry(entry);
     setEditableTitle(entry.section_title);
     setEditableContent(entry.content_markdown);
+
+    if (entry.id === 'enc-all-search') {
+      const termsMatch = entry.content_markdown.match(/'([^']*)'/g);
+      if (termsMatch) {
+        const terms = termsMatch.map(term => term.replace(/'/g, ''));
+        setBulkSearchTerms(terms.join('\n'));
+      }
+    }
   }, [entry]);
 
 
@@ -185,6 +204,40 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
           />
           <Label htmlFor={`disputed-${currentEntry.id}`} className="text-sm">Section Disputed</Label>
         </div>
+
+        {currentEntry.id === 'enc-all-search' && (
+            <Dialog open={isBulkSearchDialogOpen} onOpenChange={setIsBulkSearchDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="secondary" size="sm">
+                        <Search className="mr-2 h-4 w-4" /> Bulk Search
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Bulk Web Search</DialogTitle>
+                        <DialogDescription>
+                            Enter search terms (one per line) to search across the web. This is a conceptual feature for now.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <Label htmlFor="bulk-search-terms">Search Terms</Label>
+                        <Textarea
+                            id="bulk-search-terms"
+                            value={bulkSearchTerms}
+                            onChange={(e) => setBulkSearchTerms(e.target.value)}
+                            rows={5}
+                            placeholder="Kunwer Sachdev&#10;Kunwar Sachdeva&#10;..."
+                        />
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+                        <Button onClick={handleRunBulkSearch}>
+                            Run Search
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        )}
 
         <Dialog open={isAddLinkDialogOpen} onOpenChange={setIsAddLinkDialogOpen}>
           <DialogTrigger asChild>
@@ -301,5 +354,3 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     </Card>
   );
 }
-
-    
