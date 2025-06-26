@@ -18,7 +18,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
 import { scrapeUrlAction } from "@/app/actions/scraping-actions";
 import { format } from "date-fns";
-import { type DateRange } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -44,7 +43,8 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
 
   const [isBulkSearchDialogOpen, setIsBulkSearchDialogOpen] = useState(false);
   const [bulkSearchTerms, setBulkSearchTerms] = useState("");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
 
 
   const handleVerificationToggle = (verified: boolean) => {
@@ -75,7 +75,7 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
 
     startScraping(async () => {
       try {
-        const result = await scrapeUrlAction(newLink.url!);
+        const result = await scrapeUrlAction({ url: newLink.url! });
         setNewLink(prev => ({
           ...prev,
           title: result.title,
@@ -135,9 +135,9 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
   
   const handleRunBulkSearch = () => {
     let description = "This would search the web for your terms. This feature is not yet fully implemented.";
-    if (dateRange?.from) {
-        const from = format(dateRange.from, "PPP");
-        const to = dateRange.to ? format(dateRange.to, "PPP") : 'now';
+    if (startDate) {
+        const from = format(startDate, "PPP");
+        const to = endDate ? format(endDate, "PPP") : 'now';
         description += ` Date range: ${from} to ${to}.`;
     }
 
@@ -233,44 +233,66 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="date-range">Date Range</Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        id="date-range"
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !dateRange && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {dateRange?.from ? (
-                                            dateRange.to ? (
-                                                <>
-                                                    {format(dateRange.from, "LLL dd, y")} -{" "}
-                                                    {format(dateRange.to, "LLL dd, y")}
-                                                </>
-                                            ) : (
-                                                format(dateRange.from, "LLL dd, y")
-                                            )
-                                        ) : (
-                                            <span>Pick a date range</span>
-                                        )}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        initialFocus
-                                        mode="range"
-                                        defaultMonth={dateRange?.from}
-                                        selected={dateRange}
-                                        onSelect={setDateRange}
-                                        numberOfMonths={2}
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                       <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="start-date">Start Date</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            id="start-date"
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal",
+                                                !startDate && "text-muted-foreground"
+                                            )}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={startDate}
+                                            onSelect={setStartDate}
+                                            disabled={(date) =>
+                                                (endDate && date > endDate) || date > new Date()
+                                            }
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="end-date">End Date</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            id="end-date"
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal",
+                                                !endDate && "text-muted-foreground"
+                                            )}
+                                            disabled={!startDate}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={endDate}
+                                            onSelect={setEndDate}
+                                            disabled={(date) =>
+                                                (startDate && date < startDate) || date > new Date()
+                                            }
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="bulk-search-terms">Search Terms</Label>
