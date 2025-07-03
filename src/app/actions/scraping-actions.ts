@@ -6,22 +6,37 @@ import type { ScrapeWebsiteOutput } from "@/ai/flows/scrape-website-flow";
 export async function scrapeUrlAction(params: { url: string; cssSelector?: string }): Promise<ScrapeWebsiteOutput> {
   const { url, cssSelector } = params;
   const apiKey = process.env.SCRAPING_API_KEY;
+  const apiEndpoint = process.env.SCRAPING_API_ENDPOINT;
 
-  if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
-    throw new Error("Scraping API key is not configured. Please add it to your .env file.");
-  }
+  let htmlContent = "";
 
   try {
-    // Construct the URL for the external scraping service
-    const scraperApiUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(url)}`;
-    
-    const response = await fetch(scraperApiUrl);
+    // If API Key and Endpoint are configured, use the third-party scraping service
+    if (apiKey && apiKey !== "YOUR_API_KEY_HERE" && apiEndpoint) {
+      const scraperApiUrl = apiEndpoint
+        .replace("{API_KEY}", apiKey)
+        .replace("{URL}", encodeURIComponent(url));
+      
+      const response = await fetch(scraperApiUrl);
 
-    if (!response.ok) {
-      throw new Error(`Scraping API failed: ${response.status} ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Scraping API failed: ${response.status} ${response.statusText}`);
+      }
+      htmlContent = await response.text();
+
+    } else {
+      // Fallback to a direct fetch if no API key is configured
+      console.log("No scraping API key configured, falling back to direct fetch.");
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Direct fetch failed: ${response.status} ${response.statusText}`);
+      }
+      htmlContent = await response.text();
     }
-
-    const htmlContent = await response.text();
 
     // Pass the raw HTML and optional selector to our AI flow for analysis.
     const result = await scrapeAndAnalyzeWebsiteFlow({ htmlContent, cssSelector });
@@ -31,10 +46,7 @@ export async function scrapeUrlAction(params: { url: string; cssSelector?: strin
     console.error("Error scraping URL:", error);
     // Provide a more user-friendly error message
     if (error.message.includes('fetch') || error.name === 'TypeError' || error.message.includes('Invalid URL')) {
-      throw new Error("Could not retrieve content from the URL. Please check if the URL is correct and accessible via the scraping service.");
-    }
-     if (error.message.includes('Scraping API key')) {
-        throw error;
+      throw new Error("Could not retrieve content from the URL. Please check if the URL is correct and accessible.");
     }
     throw new Error("Failed to scrape and analyze the URL. Please try again.");
   }

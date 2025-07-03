@@ -271,6 +271,31 @@ export function SettingsTab() {
            <Button onClick={handleSavePreferences}><Save className="mr-2 h-4 w-4" /> Save Preferences</Button>
         </CardContent>
       </Card>
+      
+      <Separator />
+
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle>API Settings</CardTitle>
+          <CardDescription>Configure third-party API keys for services like web scraping.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 rounded-md bg-muted/50 border">
+              <h4 className="font-semibold text-foreground">Web Scraping API</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                  To enable a third-party scraping service, you must set the following variables in the <code>.env</code> file at the root of your project:
+              </p>
+              <div className="mt-3 space-y-2 text-xs font-mono bg-background p-3 rounded-md">
+                  <p>SCRAPING_API_KEY="YOUR_KEY_HERE"</p>
+                  <p># Example for ScraperAPI, adjust for your service:</p>
+                  <p>SCRAPING_API_ENDPOINT="http://api.scraperapi.com?api_key=&#123;API_KEY&#125;&url=&#123;URL&#125;"</p>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                  The action code will replace <code>&#123;API_KEY&#125;</code> and <code>&#123;URL&#125;</code> with the correct values at runtime. If these are not set, the app will attempt a direct, less reliable fetch.
+              </p>
+          </div>
+        </CardContent>
+      </Card>
 
        <Separator />
 
@@ -346,4 +371,3 @@ export function SettingsTab() {
     </div>
   );
 }
-
