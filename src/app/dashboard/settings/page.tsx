@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -276,22 +277,32 @@ export default function SettingsPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>API Settings</CardTitle>
-          <CardDescription>Configure third-party API keys for services like web scraping.</CardDescription>
+          <CardDescription>How to add your web scraping API key.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-4 rounded-md bg-muted/50 border">
-              <h4 className="font-semibold text-foreground">Web Scraping API</h4>
-              <p className="text-sm text-muted-foreground mt-1">
-                  To enable a third-party scraping service, you must set the following variables in the <code>.env</code> file at the root of your project:
-              </p>
-              <div className="mt-3 space-y-2 text-xs font-mono bg-background p-3 rounded-md">
-                  <p>SCRAPING_API_KEY="YOUR_KEY_HERE"</p>
-                  <p># Example for ScraperAPI, adjust for your service:</p>
-                  <p>SCRAPING_API_ENDPOINT="http://api.scraperapi.com?api_key=&#123;API_KEY&#125;&url=&#123;URL&#125;"</p>
-              </div>
+        <CardContent>
+          <div className="p-4 rounded-md bg-background border border-primary/50 shadow-md">
+              <h4 className="font-semibold text-foreground text-lg">How to Add Your API Key</h4>
               <p className="text-sm text-muted-foreground mt-2">
-                  The action code will replace <code>&#123;API_KEY&#125;</code> and <code>&#123;URL&#125;</code> with the correct values at runtime. If these are not set, the app will attempt a direct, less reliable fetch.
+                  The API key is not pasted on this screen. For your security, it must be added to a special configuration file.
               </p>
+              
+              <div className="mt-4">
+                <p className="font-semibold text-md">Step 1: Find the <code>.env</code> file</p>
+                <p className="text-sm text-muted-foreground">In the file explorer panel on the left side of this editor, find and click on the file named <strong>.env</strong>.</p>
+              </div>
+
+              <div className="mt-4">
+                <p className="font-semibold text-md">Step 2: Paste Your Key</p>
+                <p className="text-sm text-muted-foreground">Inside that file, you will see the following lines. Replace <code>YOUR_API_KEY_HERE</code> with your actual key.</p>
+                <div className="mt-2 space-y-1 text-xs font-mono bg-muted p-3 rounded-md">
+                    <p>SCRAPING_API_KEY="YOUR_API_KEY_HERE"</p>
+                    <p># Example for ScraperAPI, adjust for your service:</p>
+                    <p>SCRAPING_API_ENDPOINT="http://api.scraperapi.com?api_key=&#123;API_KEY&#125;&url=&#123;URL&#123;"</p>
+                </div>
+                 <p className="text-sm text-muted-foreground mt-2">
+                  The application will automatically use this key for all scraping requests.
+              </p>
+              </div>
           </div>
         </CardContent>
       </Card>
@@ -370,3 +381,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    

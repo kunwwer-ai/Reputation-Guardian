@@ -214,35 +214,35 @@ export function SettingsTab() {
             <h3 className="text-md font-medium mb-3">Notification Preferences</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="emailNotificationsTab" className="flex flex-col space-y-1">
+                <Label htmlFor="emailNotifications" className="flex flex-col space-y-1">
                   <span>Email Notifications</span>
                   <span className="font-normal leading-snug text-muted-foreground">
                     Receive updates and alerts via email.
                   </span>
                 </Label>
-                <Switch id="emailNotificationsTab" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+                <Switch id="emailNotifications" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="pushNotificationsTab" className="flex flex-col space-y-1">
+                <Label htmlFor="pushNotifications" className="flex flex-col space-y-1">
                   <span>Push Notifications</span>
                   <span className="font-normal leading-snug text-muted-foreground">
                     Get real-time alerts on your device (if supported).
                   </span>
                 </Label>            
-                <Switch id="pushNotificationsTab" checked={pushNotifications} onCheckedChange={setPushNotifications} />
+                <Switch id="pushNotifications" checked={pushNotifications} onCheckedChange={setPushNotifications} />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="whatsAppNumberTab">WhatsApp Number</Label>
-                <Input id="whatsAppNumberTab" type="tel" placeholder="e.g., +1234567890" value={whatsAppNumber} onChange={(e) => setWhatsAppNumber(e.target.value)} />
+                <Label htmlFor="whatsAppNumber">WhatsApp Number</Label>
+                <Input id="whatsAppNumber" type="tel" placeholder="e.g., +1234567890" value={whatsAppNumber} onChange={(e) => setWhatsAppNumber(e.target.value)} />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="whatsAppNotificationsTab" className="flex flex-col space-y-1">
+                <Label htmlFor="whatsAppNotifications" className="flex flex-col space-y-1">
                   <span>WhatsApp Notifications</span>
                   <span className="font-normal leading-snug text-muted-foreground">
                     Receive updates and alerts via WhatsApp.
                   </span>
                 </Label>
-                <Switch id="whatsAppNotificationsTab" checked={whatsAppNotifications} onCheckedChange={setWhatsAppNotifications} />
+                <Switch id="whatsAppNotifications" checked={whatsAppNotifications} onCheckedChange={setWhatsAppNotifications} />
               </div>
             </div>
           </div>
@@ -257,12 +257,12 @@ export function SettingsTab() {
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="monthly" id="analytics-monthly" />
-                  <Label htmlFor="analytics-monthly">Monthly</Label>
+                  <RadioGroupItem value="monthly" id="analytics-monthly-settings" />
+                  <Label htmlFor="analytics-monthly-settings">Monthly</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="weekly" id="analytics-weekly" />
-                  <Label htmlFor="analytics-weekly">Weekly</Label>
+                  <RadioGroupItem value="weekly" id="analytics-weekly-settings" />
+                  <Label htmlFor="analytics-weekly-settings">Weekly</Label>
                 </div>
               </RadioGroup>
               <p className="text-xs text-muted-foreground">Set the default view for the Content Trends chart in the Analytics tab.</p>
@@ -273,26 +273,36 @@ export function SettingsTab() {
       </Card>
       
       <Separator />
-
+      
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>API Settings</CardTitle>
-          <CardDescription>Configure third-party API keys for services like web scraping.</CardDescription>
+          <CardDescription>How to add your web scraping API key.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-4 rounded-md bg-muted/50 border">
-              <h4 className="font-semibold text-foreground">Web Scraping API</h4>
-              <p className="text-sm text-muted-foreground mt-1">
-                  To enable a third-party scraping service, you must set the following variables in the <code>.env</code> file at the root of your project:
-              </p>
-              <div className="mt-3 space-y-2 text-xs font-mono bg-background p-3 rounded-md">
-                  <p>SCRAPING_API_KEY="YOUR_KEY_HERE"</p>
-                  <p># Example for ScraperAPI, adjust for your service:</p>
-                  <p>SCRAPING_API_ENDPOINT="http://api.scraperapi.com?api_key=&#123;API_KEY&#125;&url=&#123;URL&#125;"</p>
-              </div>
+        <CardContent>
+          <div className="p-4 rounded-md bg-background border border-primary/50 shadow-md">
+              <h4 className="font-semibold text-foreground text-lg">How to Add Your API Key</h4>
               <p className="text-sm text-muted-foreground mt-2">
-                  The action code will replace <code>&#123;API_KEY&#125;</code> and <code>&#123;URL&#125;</code> with the correct values at runtime. If these are not set, the app will attempt a direct, less reliable fetch.
+                  The API key is not pasted on this screen. For your security, it must be added to a special configuration file.
               </p>
+              
+              <div className="mt-4">
+                <p className="font-semibold text-md">Step 1: Find the <code>.env</code> file</p>
+                <p className="text-sm text-muted-foreground">In the file explorer panel on the left side of this editor, find and click on the file named <strong>.env</strong>.</p>
+              </div>
+
+              <div className="mt-4">
+                <p className="font-semibold text-md">Step 2: Paste Your Key</p>
+                <p className="text-sm text-muted-foreground">Inside that file, you will see the following lines. Replace <code>YOUR_API_KEY_HERE</code> with your actual key.</p>
+                <div className="mt-2 space-y-1 text-xs font-mono bg-muted p-3 rounded-md">
+                    <p>SCRAPING_API_KEY="YOUR_API_KEY_HERE"</p>
+                    <p># Example for ScraperAPI, adjust for your service:</p>
+                    <p>SCRAPING_API_ENDPOINT="http://api.scraperapi.com?api_key=&#123;API_KEY&#125;&url=&#123;URL&#125;"</p>
+                </div>
+                 <p className="text-sm text-muted-foreground mt-2">
+                  The application will automatically use this key for all scraping requests.
+              </p>
+              </div>
           </div>
         </CardContent>
       </Card>
@@ -318,11 +328,11 @@ export function SettingsTab() {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="currentPasswordTab" className="text-right col-span-1">
+                  <Label htmlFor="currentPassword" className="text-right col-span-1">
                     Current
                   </Label>
                   <Input
-                    id="currentPasswordTab"
+                    id="currentPassword"
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
@@ -330,11 +340,11 @@ export function SettingsTab() {
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="newPasswordTab" className="text-right col-span-1">
+                  <Label htmlFor="newPassword" className="text-right col-span-1">
                     New
                   </Label>
                   <Input
-                    id="newPasswordTab"
+                    id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -342,11 +352,11 @@ export function SettingsTab() {
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="confirmNewPasswordTab" className="text-right col-span-1">
+                  <Label htmlFor="confirmNewPassword" className="text-right col-span-1">
                     Confirm
                   </Label>
                   <Input
-                    id="confirmNewPasswordTab"
+                    id="confirmNewPassword"
                     type="password"
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
@@ -371,3 +381,5 @@ export function SettingsTab() {
     </div>
   );
 }
+
+    
