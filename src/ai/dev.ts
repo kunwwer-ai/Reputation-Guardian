@@ -1,7 +1,4 @@
 
-import { config } from 'dotenv';
-config();
-
 import '@/ai/flows/generate-dmca-letter.ts';
 import '@/ai/flows/analyze-mention-risk.ts';
 import '@/ai/flows/summarize-content-excerpt.ts';
