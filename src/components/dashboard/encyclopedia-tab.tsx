@@ -5,13 +5,12 @@ import type { EncyclopediaEntry, EncyclopediaSourceLink } from "@/types";
 import { EncyclopediaCard } from "@/components/encyclopedia-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Link as LinkIcon, ExternalLink, Search as SearchIcon } from "lucide-react"; 
+import { PlusCircle, Search as SearchIcon } from "lucide-react"; 
 import { useState, useEffect, useMemo } from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"; 
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; 
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area"; 
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
-import { useSearchParams, useRouter } from "next/navigation"; // Added useRouter
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface EncyclopediaTabProps {
   entries: EncyclopediaEntry[];
@@ -29,13 +28,12 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
   const entries = propEntries.length > 0 ? propEntries : contextEntries;
   const setEntries = propSetEntries || contextSetEntries;
 
-  const [allUniqueLinks, setAllUniqueLinks] = useState<{ title: string; url: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
 
   const searchParams = useSearchParams();
-  const router = useRouter(); // Added useRouter
+  const router = useRouter();
 
   useEffect(() => {
     const queryFromUrl = searchParams.get('q');
@@ -43,31 +41,12 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
 
     if (queryFromUrl && currentHash === '#encyclopedia') {
       setSearchQuery(queryFromUrl);
-      // Optional: remove the query param from URL after applying it
-      // router.replace('/dashboard#encyclopedia', { scroll: false }); // Be cautious with this, might loop if not handled carefully with activeTab checks
     }
-  }, [searchParams, router]); // Removed setSearchQuery if it's stable, added router
+  }, [searchParams, router]);
 
 
   useEffect(() => {
-    if (entries.length > 0) {
-      const collectedLinks: { title: string; url: string }[] = [];
-      entries.forEach(entry => {
-        if (entry.source_links) {
-          entry.source_links.forEach(link => collectedLinks.push({ title: link.title, url: link.url }));
-        }
-      });
-
-      const uniqueLinksMap = new Map<string, { title: string; url: string }>();
-      collectedLinks.forEach(link => {
-        if (link.url && !uniqueLinksMap.has(link.url)) { 
-          uniqueLinksMap.set(link.url, link);
-        }
-      });
-      setAllUniqueLinks(Array.from(uniqueLinksMap.values()).sort((a, b) => (a.title || "").localeCompare(b.title || "")));
-    } else {
-      setAllUniqueLinks([]);
-    }
+    // This effect now simply manages the loading state for the skeleton UI.
     setIsLoading(false); 
   }, [entries]);
 
@@ -110,16 +89,11 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
   if (isLoading && entries.length === 0) { 
     return (
       <div className="space-y-6">
-        <Card className="shadow-lg mb-6">
-          <CardHeader>
-            <div className="h-7 bg-muted rounded w-1/2 animate-pulse"></div>
-            <div className="h-4 bg-muted rounded w-3/4 mt-1 animate-pulse"></div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-4 bg-muted rounded w-full animate-pulse mb-2"></div>
-            <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
-          </CardContent>
-        </Card>
+         <div className="flex justify-between items-center pt-4">
+          <h2 className="text-2xl font-semibold font-headline tracking-tight">Link Collections</h2>
+           <div className="h-10 bg-muted rounded w-36 animate-pulse"></div>
+        </div>
+
         <div className="relative mb-4">
           <div className="h-10 bg-muted rounded w-full animate-pulse"></div>
         </div>
@@ -139,41 +113,6 @@ export function EncyclopediaTab({ entries: propEntries, setEntries: propSetEntri
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-headline">Consolidated Unique Source Links</CardTitle>
-          <CardDescription>
-            This section aggregates all unique URLs from your link collections below. Duplicates are automatically removed.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {allUniqueLinks.length > 0 ? (
-            <ScrollArea className="h-72 border rounded-md p-3">
-              <ul className="space-y-2">
-                {allUniqueLinks.map((link, index) => (
-                  <li key={index} className="text-sm">
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline inline-flex items-center gap-1.5 group"
-                    >
-                      <LinkIcon className="h-4 w-4 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="truncate flex-grow" title={link.title || link.url}>
-                        {link.title || new URL(link.url).hostname}
-                      </span>
-                      <ExternalLink className="h-3 w-3 flex-shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </ScrollArea>
-          ) : (
-            <p className="text-muted-foreground">No unique source links found. Add links to the collections below.</p>
-          )}
-        </CardContent>
-      </Card>
-
       <div className="flex justify-between items-center pt-4">
         <h2 className="text-2xl font-semibold font-headline tracking-tight">Link Collections</h2>
         <Button onClick={handleAddEntry} aria-label="Add new link collection">
