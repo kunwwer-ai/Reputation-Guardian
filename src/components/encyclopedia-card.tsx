@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2, Search, Calendar as CalendarIcon } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Edit3, Link as LinkIcon, ExternalLink, PlusCircle, Wand2, Loader2, Search, Calendar as CalendarIcon, Trash2 } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useEncyclopediaContext } from "@/contexts/encyclopedia-context";
@@ -116,6 +116,19 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
     setNewLink({ title: "", url: "", excerpt: "", platform: "" }); // Reset form
     setIsAddLinkDialogOpen(false);
   };
+
+  const handleRemoveLink = (linkIdToRemove: string) => {
+    if (!currentEntry.source_links) return;
+    const updatedLinks = currentEntry.source_links.filter(
+      (link) => link.id !== linkIdToRemove
+    );
+    const updatedEntry = { ...currentEntry, source_links: updatedLinks };
+    onUpdateEntry(updatedEntry);
+    toast({
+      title: "Link Removed",
+      description: "The link has been removed from this collection.",
+    });
+  };
   
   const handleSaveSectionEdit = () => {
     if (!editableTitle.trim()) {
@@ -184,13 +197,25 @@ export function EncyclopediaCard({ entry, onUpdateEntry }: EncyclopediaCardProps
             <ScrollArea className="h-32 border rounded-md p-2">
               <ul className="space-y-1">
                 {currentEntry.source_links.map((link) => (
-                  <li key={link.id} className="text-sm p-1 hover:bg-muted/50 rounded">
-                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 group w-full">
-                      <span className="font-medium truncate group-hover:whitespace-normal" title={link.title}>{link.title}</span>
-                      <ExternalLink className="h-3 w-3 ml-auto flex-shrink-0" />
-                    </a>
-                    {link.excerpt && <p className="text-xs text-muted-foreground mt-0.5 truncate group-hover:whitespace-normal" title={link.excerpt}>{link.excerpt}</p>}
-                    {link.platform && <p className="text-xs text-muted-foreground">Platform: {link.platform}</p>}
+                  <li key={link.id} className="text-sm p-1 hover:bg-muted/50 rounded group/link-item flex items-center justify-between gap-2">
+                    <div className="flex-grow min-w-0">
+                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 group w-full">
+                        <span className="font-medium truncate group-hover:whitespace-normal" title={link.title}>{link.title}</span>
+                        <ExternalLink className="h-3 w-3 ml-auto flex-shrink-0" />
+                      </a>
+                      {link.excerpt && <p className="text-xs text-muted-foreground mt-0.5 truncate group-hover:whitespace-normal" title={link.excerpt}>{link.excerpt}</p>}
+                      {link.platform && <p className="text-xs text-muted-foreground">Platform: {link.platform}</p>}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 opacity-0 group-hover/link-item:opacity-100 transition-opacity flex-shrink-0"
+                      onClick={() => handleRemoveLink(link.id)}
+                      aria-label="Remove link"
+                      title="Remove link"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </li>
                 ))}
               </ul>
